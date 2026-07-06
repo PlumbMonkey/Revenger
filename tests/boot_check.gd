@@ -1,19 +1,21 @@
 extends Node
-## Phase 1 deliverable proof: all six autoloads registered and talking over
-## the EventBus. Runs real traffic through the bus (game start, a wave, two
-## enemy kills, a rescue) and asserts the managers reacted. Prints a PASS/FAIL
-## report; exits with it as the process code when run headless.
+## Phase 1 + Phase 2 integration proof: all autoloads, EventBus traffic,
+## real data-driven wave spawning. Runs headless in under 15 s.
 
 var _failures: PackedStringArray = []
 var _score_events: int = 0
 var _wave_events: int = 0
 var _scheme_events: int = 0
+var _p2_spawned: int = 0
+var _p2_score_events: int = 0
+var _p2_done: bool = false
 
 
 func _ready() -> void:
 	_check_autoloads_registered()
 	_check_input_contract()
-	_check_eventbus_traffic()
+	_check_eventbus_traffic()   # Phase 1 — synchronous
+	await _check_wave_spawner() # Phase 2 — async (real enemy instancing)
 	_report()
 
 
@@ -47,11 +49,6 @@ func _check_eventbus_traffic() -> void:
 	if GameManager.state != GameManager.State.PLAYING:
 		_failures.append("GameManager did not enter PLAYING on start_game()")
 
-	WaveSpawner.load_waves(["placeholder_wave_a", "placeholder_wave_b"])
-	WaveSpawner.start_waves()
-	if _wave_events != 1:
-		_failures.append("wave_started not received via EventBus")
-
 	EventBus.enemy_died.emit(self, 100, Vector3.ZERO)
 	EventBus.enemy_died.emit(self, 100, Vector3.ZERO)
 	if ScoreManager.score != 250:
@@ -62,23 +59,81 @@ func _check_eventbus_traffic() -> void:
 	EventBus.npc_rescued.emit(self, 500)
 	EventBus.vfx_burst_requested.emit(&"explosion_large", Vector3(1, 2, 0))
 
-	WaveSpawner.complete_current_wave()
-	WaveSpawner.complete_current_wave()
-	if WaveSpawner.is_running:
-		_failures.append("WaveSpawner still running after final wave completed")
-
-	# reset() fires on game_started, so a fresh score_changed baseline (1) plus
-	# two kills and the rescue = 4 total events through the bus.
+	# reset() fires on game_started (1) + two kills (2) + rescue (1) = 4.
 	if _score_events != 4:
 		_failures.append("expected 4 score_changed events, got %d" % _score_events)
 
 
+func _check_wave_spawner() -> void:
+	## Phase 2: load real WaveSet, spawn real enemies, kill them, await completion.
+	##
+	## Score chain (all within combo window):
+	##   kill 1: 100 × 1.0 = 100   kill 2: 100 × 1.5 = 150
+	##   kill 3: 100 × 2.0 = 200   kill 4: 100 × 2.5 = 250
+	##   kill 5: 100 × 3.0 = 300   total = 1000
+
+	# Connect phase-2 counters before start_game() so the reset event is counted.
+	EventBus.score_changed.connect(func(_s: int) -> void: _p2_score_events += 1)
+	EventBus.enemy_spawned.connect(func(enemy: Node) -> void:
+		_p2_spawned += 1
+		# Kill immediately so ALL_DEFEATED can complete the wave.
+		if enemy is EnemyBase:
+			(enemy as EnemyBase).take_hit(999.0)
+	)
+
+	# Fresh state: emits score_changed(0) → _p2_score_events = 1.
+	GameManager.start_game()
+
+	# Spawn marker — enemies land at its position (origin is fine for tests).
+	var marker := Node3D.new()
+	marker.add_to_group("spawn_points")
+	add_child(marker)
+	WaveSpawner.set_enemy_container(self)
+
+	var wave_set: WaveSet = load("res://tests/data/test_wave_set.tres") as WaveSet
+	if wave_set == null:
+		_failures.append("Phase 2: failed to load res://tests/data/test_wave_set.tres")
+		return
+
+	WaveSpawner.load_waves(wave_set)
+	WaveSpawner.start_waves()
+
+	# Await all_waves_completed with a 15 s timeout guard.
+	# Use a member variable (_p2_done) — GDScript lambda closures cannot
+	# reliably update local variables across coroutine suspension points.
+	_p2_done = false
+	EventBus.all_waves_completed.connect(_on_p2_waves_done, CONNECT_ONE_SHOT)
+	var deadline: float = Time.get_ticks_msec() / 1000.0 + 15.0
+	while not _p2_done:
+		await get_tree().process_frame
+		if Time.get_ticks_msec() / 1000.0 > deadline:
+			_failures.append("Phase 2: timed out waiting for all_waves_completed")
+			_p2_done = true
+
+	if WaveSpawner.is_running:
+		_failures.append("Phase 2: WaveSpawner still running after all_waves_completed")
+	if _p2_spawned != 5:
+		_failures.append("Phase 2: expected 5 enemies spawned, got %d" % _p2_spawned)
+	if _wave_events != 2:
+		_failures.append("Phase 2: expected 2 wave_started events, got %d" % _wave_events)
+	# reset (1) + 5 kills (5) = 6 score_changed events.
+	if _p2_score_events != 6:
+		_failures.append("Phase 2: expected 6 score_changed events, got %d" % _p2_score_events)
+	if ScoreManager.score != 1000:
+		_failures.append("Phase 2: expected score 1000 for 5 combo kills, got %d" % ScoreManager.score)
+
+
+func _on_p2_waves_done() -> void:
+	_p2_done = true
+
+
 func _report() -> void:
 	if _failures.is_empty():
-		print("BOOT CHECK PASS — 7 autoloads registered, input contract + EventBus traffic verified (final score: %d)" % ScoreManager.score)
+		print("BOOT CHECK PASS — 7 autoloads registered, input contract + EventBus traffic verified" \
+				+ " (Phase 1 score: 750, Phase 2 score: %d)" % ScoreManager.score)
 	else:
 		print("BOOT CHECK FAIL:")
-		for failure in _failures:
+		for failure: String in _failures:
 			print("  - " + failure)
 
 	if DisplayServer.get_name() == "headless":

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="WaveSet" load_steps=9 format=3]
+
+[ext_resource type="Script" uid="uid://cqlf2auh0828s" path="res://framework/data/wave_set.gd" id="1_waveset"]
+[ext_resource type="Script" uid="uid://vxa2vukysds8" path="res://framework/data/wave_definition.gd" id="2_wavedef"]
+[ext_resource type="Script" uid="uid://bq677ginkcxhv" path="res://framework/data/spawn_entry.gd" id="3_spawnentry"]
+[ext_resource type="Resource" path="res://tests/data/test_enemy.tres" id="4_enemy"]
+
+[sub_resource type="Resource" id="SpawnEntry_1"]
+script = ExtResource("3_spawnentry")
+enemy = ExtResource("4_enemy")
+count = 2
+start_delay = 0.0
+interval = 0.1
+
+[sub_resource type="Resource" id="WaveDef_1"]
+script = ExtResource("2_wavedef")
+id = &"test_wave_1"
+entries = Array[Resource]([SubResource("SpawnEntry_1")])
+completion = 0
+
+[sub_resource type="Resource" id="SpawnEntry_2"]
+script = ExtResource("3_spawnentry")
+enemy = ExtResource("4_enemy")
+count = 3
+start_delay = 0.0
+interval = 0.1
+
+[sub_resource type="Resource" id="WaveDef_2"]
+script = ExtResource("2_wavedef")
+id = &"test_wave_2"
+entries = Array[Resource]([SubResource("SpawnEntry_2")])
+completion = 0
+
+[resource]
+script = ExtResource("1_waveset")
+id = &"test_set"
+waves = Array[Resource]([SubResource("WaveDef_1"), SubResource("WaveDef_2")])
+time_between_waves = 0.1

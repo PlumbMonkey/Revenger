@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" uid="uid://bflbiu67cjisg" path="res://framework/data/enemy_definition.gd" id="1_enemydef"]
+[ext_resource type="PackedScene" path="res://tests/placeholder_enemy.tscn" id="2_scene"]
+[ext_resource type="Script" path="res://framework/movement/patterns/linear_pattern.gd" id="3_linear"]
+
+[resource]
+script = ExtResource("1_enemydef")
+id = &"test_grunt"
+display_name = "Test Grunt"
+scene = ExtResource("2_scene")
+max_health = 2.0
+points = 100
+movement_pattern = ExtResource("3_linear")
+movement_params = {"direction": Vector3(-1, 0, 0), "speed": 4.0}
+death_burst = &"explosion_small"
+hit_flash = &"hit_flash"
