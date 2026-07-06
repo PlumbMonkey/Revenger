@@ -1,0 +1,38 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Revenger"
+run/main_scene="res://tests/boot_check.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+EventBus="*res://framework/autoload/event_bus.gd"
+GameManager="*res://framework/autoload/game_manager.gd"
+ScoreManager="*res://framework/autoload/score_manager.gd"
+WaveSpawner="*res://framework/autoload/wave_spawner.gd"
+VFXManager="*res://framework/autoload/vfx_manager.gd"
+HUDManager="*res://framework/autoload/hud_manager.gd"
+
+[display]
+
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
