@@ -18,6 +18,12 @@ func _ready() -> void:
 	EventBus.player_died.connect(_on_player_died)
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"pause"):
+		toggle_pause()
+		get_viewport().set_input_as_handled()
+
+
 func start_game() -> void:
 	lives = STARTING_LIVES
 	current_level = 0

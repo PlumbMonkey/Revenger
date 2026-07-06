@@ -44,4 +44,8 @@ signal npc_lost(npc: Node)
 signal vfx_burst_requested(burst_type: StringName, position: Vector3)
 signal screen_shake_requested(intensity: float, duration: float)
 
+# -- Settings & input --
+signal control_scheme_changed(scheme: int)  # SettingsManager.ControlScheme value
+signal settings_changed(section: StringName, key: StringName, value: Variant)
+
 @warning_ignore_restore("unused_signal")

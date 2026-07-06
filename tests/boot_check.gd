@@ -7,18 +7,36 @@ extends Node
 var _failures: PackedStringArray = []
 var _score_events: int = 0
 var _wave_events: int = 0
+var _scheme_events: int = 0
 
 
 func _ready() -> void:
 	_check_autoloads_registered()
+	_check_input_contract()
 	_check_eventbus_traffic()
 	_report()
 
 
 func _check_autoloads_registered() -> void:
-	for autoload_name in ["EventBus", "GameManager", "ScoreManager", "WaveSpawner", "VFXManager", "HUDManager"]:
+	for autoload_name in ["EventBus", "SettingsManager", "GameManager", "ScoreManager", "WaveSpawner", "VFXManager", "HUDManager"]:
 		if get_node_or_null("/root/" + autoload_name) == null:
 			_failures.append("autoload not registered: " + autoload_name)
+
+
+func _check_input_contract() -> void:
+	for action in ["move_left", "move_right", "move_up", "move_down", "fire",
+			"action_secondary", "aim_left", "aim_right", "aim_up", "aim_down", "pause"]:
+		if not InputMap.has_action(action):
+			_failures.append("InputMap action missing: " + action)
+
+	EventBus.control_scheme_changed.connect(func(_scheme: int) -> void: _scheme_events += 1)
+	var original: int = SettingsManager.control_scheme
+	SettingsManager.control_scheme = SettingsManager.ControlScheme.GAMEPAD \
+			if original != SettingsManager.ControlScheme.GAMEPAD \
+			else SettingsManager.ControlScheme.KEYBOARD_MOUSE
+	SettingsManager.control_scheme = original
+	if _scheme_events != 2:
+		_failures.append("control_scheme_changed not routed via EventBus (got %d events)" % _scheme_events)
 
 
 func _check_eventbus_traffic() -> void:
@@ -57,7 +75,7 @@ func _check_eventbus_traffic() -> void:
 
 func _report() -> void:
 	if _failures.is_empty():
-		print("BOOT CHECK PASS — 6 autoloads registered, EventBus traffic verified (final score: %d)" % ScoreManager.score)
+		print("BOOT CHECK PASS — 7 autoloads registered, input contract + EventBus traffic verified (final score: %d)" % ScoreManager.score)
 	else:
 		print("BOOT CHECK FAIL:")
 		for failure in _failures:
