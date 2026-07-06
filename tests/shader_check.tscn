@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://tests/shader_check.gd" id="1_script"]
+[ext_resource type="Material" path="res://framework/shaders/materials/toon_hull_primary.tres" id="2_hull_mat"]
+[ext_resource type="Material" path="res://framework/shaders/materials/toon_gun_metal.tres" id="3_gun_mat"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_1"]
+
+[node name="ShaderCheck" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="HullPreview" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_1")
+surface_material_override/0 = ExtResource("2_hull_mat")
+
+[node name="GunPreview" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+mesh = SubResource("SphereMesh_1")
+surface_material_override/0 = ExtResource("3_gun_mat")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.7071, -0.5, 0.5, 0, 0.7071, 0.7071, -0.7071, -0.5, 0.5, 0, 3, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 5)

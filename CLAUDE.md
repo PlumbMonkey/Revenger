@@ -49,10 +49,25 @@ authored data, not code (Phase 2).
 ## Layout
 
 ```
-framework/    reusable core (autoloads, movement, enemies, pickups, vfx, hud, data)
+framework/    reusable core (autoloads, movement, enemies, pickups, vfx, hud, data, shaders)
 games/        game-specific scenes/scripts/assets (games/revenger/ first)
 tests/        boot_check.tscn is the current main scene / integration proof
 ```
+
+## Visual style: stylized flat/toon
+
+All three games share one NPR look via `framework/shaders/toon.gdshader` — a
+custom `light()` override banding `dot(N,L)` into steps (`band_count` per
+material) plus a rim-light term. **Godot doesn't import a toon look from
+Blender** — glTF only carries PBR metallic/roughness data, so art only ever
+supplies a flat albedo (texture or tint) in Blender; the banding/rim happens
+entirely in this shader at runtime. Presets live in
+`framework/shaders/materials/*.tres`, one per part type (e.g.
+`toon_hull_primary.tres`, `toon_gun_metal.tres`) — colors should match the
+source .blend material's Base Color so the Blender viewport and Godot preview
+stay in sync. `tests/shader_check.tscn` is a standalone headless check that
+the shader and presets load without compile errors (separate from
+`boot_check.tscn` since it needs its own camera/light).
 
 ## Verify
 
