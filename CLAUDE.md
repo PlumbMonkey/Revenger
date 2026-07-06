@@ -68,8 +68,8 @@ flows. Keep this scene passing; extend it as phases land.
 ## Phase status (PRD: 6 phases, ~15 sprints)
 
 1. Scaffolding & autoloads — **DONE** (shell + boot check)
-2. Wave spawner & data-driven enemies — **SPEC READY: build from `docs/PHASE2_SPEC.md`**
-   (Resource schema already in `framework/data/`; spec is the contract — implement, don't redesign)
+2. Wave spawner & data-driven enemies — **DONE** (built via VS Code Copilot/Sonnet 4.6
+   from `docs/PHASE2_SPEC.md`, verified headless in this session)
 3. VFX & particle pooling (`VFXManager.burst()` API is final, body is a stub)
 4. Scoring & HUD (`ScoreManager` logic works; HUD scenes are stubs) — also owns
    the pause menu + settings screen with control-scheme selector (see Input above)
