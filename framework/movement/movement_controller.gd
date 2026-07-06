@@ -8,9 +8,31 @@ extends Node
 ## twin-stick (Robotron-alike). The framework only ever talks to this base
 ## class — it must never know which implementation is active.
 ##
-## Usage: add a MovementController subclass as a child of the actor. Each
-## physics frame the actor calls compute_velocity() and applies the result
-## itself (move_and_slide etc.) — controllers compute intent, actors move.
+## Usage: add a MovementController subclass as a child of the actor and call
+## setup(). Each physics frame the actor calls compute_velocity() and applies
+## the result itself (move_and_slide etc.) — controllers compute intent,
+## actors move. Enemy patterns are these too: EnemyBase instantiates the
+## pattern script from EnemyDefinition.movement_pattern and calls setup()
+## with EnemyDefinition.movement_params.
+
+## The body this controller steers. Never assume a concrete subclass beyond
+## Node3D — patterns must work for any game's actors.
+var actor: Node3D
+
+## Pattern-specific tuning (speed, direction, amplitude...). For enemies this
+## comes straight from EnemyDefinition.movement_params.
+var params: Dictionary = {}
+
+
+func setup(p_actor: Node3D, p_params: Dictionary = {}) -> void:
+	actor = p_actor
+	params = p_params
+	_on_setup()
+
+
+## Override to cache params / initialise pattern state after setup().
+func _on_setup() -> void:
+	pass
 
 
 ## Return the new velocity given the current one. Read input/AI state here.
