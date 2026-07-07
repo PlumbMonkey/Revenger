@@ -30,3 +30,10 @@ extends Resource
 ## VFX burst type names passed to VFXManager (Phase 3 maps them to pools).
 @export var death_burst: StringName = &"explosion_small"
 @export var hit_flash: StringName = &"hit_flash"
+
+## Optional weapon: a projectile scene fired straight ahead (local -Z) every
+## fire_interval seconds. 0 interval or null scene = this enemy doesn't shoot.
+## Which enemy fires what is authored here in data — never coded.
+@export var weapon_scene: PackedScene
+@export var fire_interval: float = 0.0
+@export var muzzle_offset: Vector3 = Vector3(0, 0, -2)

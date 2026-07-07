@@ -27,7 +27,7 @@ func _ready() -> void:
 
 
 func _fire() -> void:
-	var bolt: LaserBolt = BOLT.instantiate()
+	var bolt: Projectile = BOLT.instantiate()
 	add_child(bolt)
 	# alternate between the two wing-gun heights, flying toward -Z
 	var side: float = 1.0 if (Time.get_ticks_msec() / 450) % 2 == 0 else -1.0

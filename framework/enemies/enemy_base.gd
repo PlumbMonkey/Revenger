@@ -19,6 +19,7 @@ func _ready() -> void:
 func setup(p_definition: EnemyDefinition) -> void:
 	definition = p_definition
 	health = definition.max_health
+	_setup_weapon()
 	if definition.movement_pattern == null:
 		return
 	var node: Object = definition.movement_pattern.new()
@@ -51,3 +52,25 @@ func _physics_process(delta: float) -> void:
 		return
 	velocity = _pattern.compute_velocity(velocity, delta)
 	move_and_slide()
+
+
+## Weapon comes from data (EnemyDefinition.weapon_scene + fire_interval).
+## Fires straight ahead along local -Z; the projectile scene's collision
+## layers decide what it can hit. Timer is pausable with the tree.
+func _setup_weapon() -> void:
+	if definition.weapon_scene == null or definition.fire_interval <= 0.0:
+		return
+	var timer := Timer.new()
+	timer.wait_time = definition.fire_interval
+	timer.autostart = true
+	timer.timeout.connect(_fire)
+	add_child(timer)
+
+
+func _fire() -> void:
+	var shot: Node = definition.weapon_scene.instantiate()
+	get_parent().add_child(shot)
+	if shot is Node3D:
+		var shot3d := shot as Node3D
+		shot3d.global_transform.basis = global_transform.basis
+		shot3d.global_position = global_position + global_transform.basis * definition.muzzle_offset

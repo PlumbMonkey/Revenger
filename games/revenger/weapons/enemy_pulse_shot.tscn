@@ -1,0 +1,33 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://games/revenger/weapons/projectile.gd" id="1_script"]
+[ext_resource type="Shader" path="res://games/revenger/shaders/pulse_shot.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pulse"]
+render_priority = 1
+shader = ExtResource("2_shader")
+
+[sub_resource type="SphereMesh" id="SphereMesh_pulse"]
+radius = 0.6
+height = 1.2
+radial_segments = 24
+rings = 12
+
+[sub_resource type="SphereShape3D" id="SphereShape_pulse"]
+radius = 0.7
+
+[node name="EnemyPulseShot" type="Area3D"]
+collision_layer = 16
+collision_mask = 3
+script = ExtResource("1_script")
+speed = 16.0
+lifetime = 5.0
+damage = 0.5
+impact_burst = &"pulse_impact"
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_pulse")
+material_override = SubResource("ShaderMaterial_pulse")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape_pulse")

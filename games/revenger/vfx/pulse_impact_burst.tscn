@@ -1,0 +1,58 @@
+[gd_scene load_steps=8 format=3]
+
+[sub_resource type="Gradient" id="Gradient_pulse"]
+offsets = PackedFloat32Array(0, 0.2, 0.5, 0.8, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.3, 1, 0.75, 1, 0.1, 0.9, 1, 1, 0.3, 0.4, 1, 1, 0.1, 0.2, 0.8, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture_pulse"]
+gradient = SubResource("Gradient_pulse")
+
+[sub_resource type="Gradient" id="Gradient_dot"]
+offsets = PackedFloat32Array(0, 0.45, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.6, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture_dot"]
+gradient = SubResource("Gradient_dot")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_pulse"]
+lifetime_randomness = 0.4
+emission_shape = 1
+emission_sphere_radius = 0.5
+spread = 180.0
+initial_velocity_min = 4.0
+initial_velocity_max = 10.0
+gravity = Vector3(0, 0, 0)
+damping_min = 5.0
+damping_max = 9.0
+scale_min = 0.45
+scale_max = 0.9
+hue_variation_min = -0.15
+hue_variation_max = 0.15
+color_ramp = SubResource("GradientTexture_pulse")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial_pulse"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = SubResource("GradientTexture_dot")
+blend_mode = 1
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_pulse"]
+material = SubResource("StandardMaterial_pulse")
+size = Vector2(0.3, 0.3)
+
+[node name="PulseImpactBurst" type="GPUParticles3D"]
+emitting = false
+amount = 28
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_pulse")
+draw_pass_1 = SubResource("QuadMesh_pulse")

@@ -54,6 +54,21 @@ games/        game-specific scenes/scripts/assets (games/revenger/ first)
 tests/        boot_check.tscn is the current main scene / integration proof
 ```
 
+## Projectiles & collision layers
+
+One `Projectile` script (`games/revenger/weapons/projectile.gd`, Area3D, flies
+local -Z, calls `take_hit(damage)` on what it hits, requests a burst, frees).
+WHO a shot can hit is decided by **collision layers/masks in the scene**, never
+type checks. Layers: `world`(1), `player`(2), `enemies`(3), `player_shots`(4),
+`enemy_shots`(5). Player shots mask world+enemies; enemy shots mask world+player.
+
+Enemy weapons are **data-driven**: `EnemyDefinition.weapon_scene` +
+`fire_interval` + `muzzle_offset`. EnemyBase fires it straight ahead on a
+pausable Timer — no weapon logic per enemy type, just data. Shots:
+`laser_bolt` (player), `enemy_laser_bolt` (fast neon bolt), `enemy_pulse_shot`
+(slow glowing orb, `pulse_shot.gdshader` breathing sphere). `tests/enemy_fire_demo.tscn`
+verifies both enemy weapons connect headless.
+
 ## Visual style: stylized flat/toon
 
 All three games share one NPR look via `framework/shaders/toon.gdshader` — a
