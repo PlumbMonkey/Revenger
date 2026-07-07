@@ -1,0 +1,59 @@
+[gd_resource type="Resource" script_class="WaveSet" format=3]
+
+[ext_resource type="Script" path="res://framework/data/wave_set.gd" id="1_y5isv"]
+[ext_resource type="Script" path="res://framework/data/wave_definition.gd" id="2_jjjdj"]
+[ext_resource type="Script" path="res://framework/data/spawn_entry.gd" id="3_j8vsv"]
+[ext_resource type="Resource" path="res://games/revenger/enemies/grunt.tres" id="4_72t3d"]
+[ext_resource type="Resource" path="res://games/revenger/enemies/gunner.tres" id="5_nmitv"]
+[ext_resource type="Resource" path="res://games/revenger/enemies/swarmer.tres" id="6_iv8u5"]
+
+[sub_resource type="Resource" id="Resource_58h7n"]
+script = ExtResource("3_j8vsv")
+enemy = ExtResource("4_72t3d")
+count = 4
+interval = 0.6
+
+[sub_resource type="Resource" id="Resource_5xnmx"]
+script = ExtResource("2_jjjdj")
+id = &"level_1_wave"
+entries = Array[ExtResource("3_j8vsv")]([SubResource("Resource_58h7n")])
+
+[sub_resource type="Resource" id="Resource_k1wt2"]
+script = ExtResource("3_j8vsv")
+enemy = ExtResource("5_nmitv")
+count = 2
+interval = 1.0
+
+[sub_resource type="Resource" id="Resource_7jm7n"]
+script = ExtResource("3_j8vsv")
+enemy = ExtResource("4_72t3d")
+count = 3
+interval = 0.7
+
+[sub_resource type="Resource" id="Resource_lbop6"]
+script = ExtResource("2_jjjdj")
+id = &"level_1_wave"
+entries = Array[ExtResource("3_j8vsv")]([SubResource("Resource_k1wt2"), SubResource("Resource_7jm7n")])
+
+[sub_resource type="Resource" id="Resource_mcaor"]
+script = ExtResource("3_j8vsv")
+enemy = ExtResource("6_iv8u5")
+count = 3
+interval = 0.25
+
+[sub_resource type="Resource" id="Resource_pc46b"]
+script = ExtResource("3_j8vsv")
+enemy = ExtResource("4_72t3d")
+count = 2
+interval = 0.8
+
+[sub_resource type="Resource" id="Resource_8v0gf"]
+script = ExtResource("2_jjjdj")
+id = &"level_1_wave"
+entries = Array[ExtResource("3_j8vsv")]([SubResource("Resource_mcaor"), SubResource("Resource_pc46b")])
+
+[resource]
+script = ExtResource("1_y5isv")
+id = &"level_1"
+waves = Array[ExtResource("2_jjjdj")]([SubResource("Resource_5xnmx"), SubResource("Resource_lbop6"), SubResource("Resource_8v0gf")])
+time_between_waves = 3.0

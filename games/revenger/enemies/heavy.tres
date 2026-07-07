@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" format=3]
+
+[ext_resource type="Material" path="res://games/revenger/enemies/materials/toon_enemy_heavy.tres" id="1_irc2s"]
+[ext_resource type="Script" path="res://framework/movement/patterns/linear_pattern.gd" id="2_pwv4g"]
+[ext_resource type="PackedScene" path="res://games/revenger/enemies/enemy_heavy.tscn" id="3_mqd3c"]
+[ext_resource type="Script" path="res://framework/data/enemy_definition.gd" id="4_v0aek"]
+[ext_resource type="PackedScene" path="res://games/revenger/weapons/enemy_laser_bolt.tscn" id="5_fq081"]
+
+[resource]
+script = ExtResource("4_v0aek")
+id = &"heavy"
+display_name = "Heavy"
+scene = ExtResource("3_mqd3c")
+max_health = 10.0
+points = 600
+movement_pattern = ExtResource("2_pwv4g")
+movement_params = {
+"direction": Vector3(0, 0, -1),
+"speed": 3.0
+}
+death_burst = &"laser_impact"
+hit_flash = &"laser_impact"
+weapon_scene = ExtResource("5_fq081")
+fire_interval = 1.4
+muzzle_offset = Vector3(0, 0, -5)
+material_override = ExtResource("1_irc2s")

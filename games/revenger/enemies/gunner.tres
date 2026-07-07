@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" format=3]
+
+[ext_resource type="Material" path="res://games/revenger/enemies/materials/toon_enemy_gunner.tres" id="1_odkfr"]
+[ext_resource type="Script" path="res://framework/movement/patterns/linear_pattern.gd" id="2_deei8"]
+[ext_resource type="PackedScene" path="res://games/revenger/enemies/enemy_gunner.tscn" id="3_ipfri"]
+[ext_resource type="Script" path="res://framework/data/enemy_definition.gd" id="4_gc17b"]
+[ext_resource type="PackedScene" path="res://games/revenger/weapons/enemy_pulse_shot.tscn" id="5_cgesf"]
+
+[resource]
+script = ExtResource("4_gc17b")
+id = &"gunner"
+display_name = "Gunner"
+scene = ExtResource("3_ipfri")
+max_health = 3.0
+points = 150
+movement_pattern = ExtResource("2_deei8")
+movement_params = {
+"direction": Vector3(0, 0, -1),
+"speed": 5.0
+}
+death_burst = &"pulse_impact"
+hit_flash = &"pulse_impact"
+weapon_scene = ExtResource("5_cgesf")
+fire_interval = 1.6
+muzzle_offset = Vector3(0, 0, -3.5)
+material_override = ExtResource("1_odkfr")

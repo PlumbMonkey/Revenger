@@ -1,0 +1,70 @@
+[gd_resource type="Resource" script_class="WaveSet" format=3]
+
+[ext_resource type="Script" path="res://framework/data/wave_set.gd" id="1_tr4x5"]
+[ext_resource type="Script" path="res://framework/data/wave_definition.gd" id="2_qgga2"]
+[ext_resource type="Script" path="res://framework/data/spawn_entry.gd" id="3_j5a4x"]
+[ext_resource type="Resource" path="res://games/revenger/enemies/gunner.tres" id="4_l1m5k"]
+[ext_resource type="Resource" path="res://games/revenger/enemies/swarmer.tres" id="5_rqo3b"]
+[ext_resource type="Resource" path="res://games/revenger/enemies/heavy.tres" id="6_cx51q"]
+
+[sub_resource type="Resource" id="Resource_da3ix"]
+script = ExtResource("3_j5a4x")
+enemy = ExtResource("4_l1m5k")
+count = 3
+interval = 0.7
+
+[sub_resource type="Resource" id="Resource_rnshv"]
+script = ExtResource("3_j5a4x")
+enemy = ExtResource("5_rqo3b")
+count = 3
+interval = 0.25
+
+[sub_resource type="Resource" id="Resource_1g5le"]
+script = ExtResource("2_qgga2")
+id = &"level_3_wave"
+entries = Array[ExtResource("3_j5a4x")]([SubResource("Resource_da3ix"), SubResource("Resource_rnshv")])
+
+[sub_resource type="Resource" id="Resource_grxvr"]
+script = ExtResource("3_j5a4x")
+enemy = ExtResource("6_cx51q")
+count = 2
+interval = 1.5
+
+[sub_resource type="Resource" id="Resource_gcmcx"]
+script = ExtResource("3_j5a4x")
+enemy = ExtResource("5_rqo3b")
+count = 3
+interval = 0.25
+
+[sub_resource type="Resource" id="Resource_c6unj"]
+script = ExtResource("2_qgga2")
+id = &"level_3_wave"
+entries = Array[ExtResource("3_j5a4x")]([SubResource("Resource_grxvr"), SubResource("Resource_gcmcx")])
+
+[sub_resource type="Resource" id="Resource_h3xan"]
+script = ExtResource("3_j5a4x")
+enemy = ExtResource("6_cx51q")
+interval = 0.0
+
+[sub_resource type="Resource" id="Resource_fd2yf"]
+script = ExtResource("3_j5a4x")
+enemy = ExtResource("4_l1m5k")
+count = 4
+interval = 0.6
+
+[sub_resource type="Resource" id="Resource_1jcsp"]
+script = ExtResource("3_j5a4x")
+enemy = ExtResource("5_rqo3b")
+count = 3
+interval = 0.25
+
+[sub_resource type="Resource" id="Resource_0n7lj"]
+script = ExtResource("2_qgga2")
+id = &"level_3_wave"
+entries = Array[ExtResource("3_j5a4x")]([SubResource("Resource_h3xan"), SubResource("Resource_fd2yf"), SubResource("Resource_1jcsp")])
+
+[resource]
+script = ExtResource("1_tr4x5")
+id = &"level_3"
+waves = Array[ExtResource("2_qgga2")]([SubResource("Resource_1g5le"), SubResource("Resource_c6unj"), SubResource("Resource_0n7lj")])
+time_between_waves = 3.0

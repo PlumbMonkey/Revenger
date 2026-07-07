@@ -20,6 +20,8 @@ func setup(p_definition: EnemyDefinition) -> void:
 	definition = p_definition
 	health = definition.max_health
 	_setup_weapon()
+	if definition.material_override != null:
+		_apply_material(self, definition.material_override)
 	if definition.movement_pattern == null:
 		return
 	var node: Object = definition.movement_pattern.new()
@@ -52,6 +54,13 @@ func _physics_process(delta: float) -> void:
 		return
 	velocity = _pattern.compute_velocity(velocity, delta)
 	move_and_slide()
+
+
+func _apply_material(node: Node, mat: Material) -> void:
+	if node is MeshInstance3D:
+		(node as MeshInstance3D).material_override = mat
+	for child: Node in node.get_children():
+		_apply_material(child, mat)
 
 
 ## Weapon comes from data (EnemyDefinition.weapon_scene + fire_interval).

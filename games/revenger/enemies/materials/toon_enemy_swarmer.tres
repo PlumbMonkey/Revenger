@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://framework/shaders/toon.gdshader" id="1_v7oq7"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_v7oq7")
+shader_parameter/albedo_tint = Color(0.97, 0.52, 0.1, 1)
+shader_parameter/band_count = 2
+shader_parameter/shadow_softness = 0.05
+shader_parameter/rim_color = Color(0.8, 0.9, 1, 1)
+shader_parameter/rim_power = 2.5
+shader_parameter/rim_intensity = 0.7

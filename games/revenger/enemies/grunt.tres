@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" format=3]
+
+[ext_resource type="Material" path="res://games/revenger/enemies/materials/toon_enemy_grunt.tres" id="1_bji6v"]
+[ext_resource type="Script" path="res://framework/movement/patterns/linear_pattern.gd" id="2_lppa2"]
+[ext_resource type="PackedScene" path="res://games/revenger/enemies/enemy_grunt.tscn" id="3_2ey0k"]
+[ext_resource type="Script" path="res://framework/data/enemy_definition.gd" id="4_o6ogu"]
+[ext_resource type="PackedScene" path="res://games/revenger/weapons/enemy_pulse_shot.tscn" id="5_3bsni"]
+
+[resource]
+script = ExtResource("4_o6ogu")
+id = &"grunt"
+display_name = "Grunt"
+scene = ExtResource("3_2ey0k")
+max_health = 2.0
+movement_pattern = ExtResource("2_lppa2")
+movement_params = {
+"direction": Vector3(0, 0, -1),
+"speed": 6.0
+}
+death_burst = &"pulse_impact"
+hit_flash = &"pulse_impact"
+weapon_scene = ExtResource("5_3bsni")
+fire_interval = 2.2
+material_override = ExtResource("1_bji6v")

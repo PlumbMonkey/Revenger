@@ -37,3 +37,8 @@ extends Resource
 @export var weapon_scene: PackedScene
 @export var fire_interval: float = 0.0
 @export var muzzle_offset: Vector3 = Vector3(0, 0, -2)
+
+## Optional look override applied to every MeshInstance3D in the spawned enemy.
+## Lets imported glTF ships (flat/untextured from Blender) get the shared toon
+## material at spawn — art stays flat in Blender, styled here per the pipeline.
+@export var material_override: Material
