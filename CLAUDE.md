@@ -107,7 +107,17 @@ Revenger specifics live in `games/revenger/rescue/` and `games/revenger/enemies/
 - `humanoid.gd` (`extends RescueObject`) binds states to an `AnimationPlayer`
   clip contract — **`run` / `struggle` / `fall` / `wave` / `smashed`**. Author
   these once on a shared VRM rig; they play on all 4 humanoid models. Missing
-  clips no-op (`has_animation` guarded), so the capsule placeholder works today.
+  clips no-op (`has_animation` guarded), so it works with or without them.
+- **Real humanoid models are in**: `humanoid_1..4.tscn` wrap the owner's 4 VRM
+  exports (`Revenger. humanoid {1..4}.glb`) at the established 5.72x
+  VRoid-to-Revenger scale (same factor as Crackle in the hero ship, kept as an
+  object-level `Model` scale, not baked into the mesh). All 4 share the core
+  VRM bone naming (`J_Bip_C_*`) despite differing accessory-bone counts, so
+  clips authored once will retarget across all of them. `humanoid_3` is the
+  child (~1.36 vs ~1.6-1.79 raw units for the other three). No animation clips
+  exist yet — `rescue_playtest.tscn` cycles through these 4 real characters;
+  `rescue_check.tscn` still uses the plain capsule (`humanoid.tscn`) for a
+  faster, art-independent logic test.
 - `captor.gd` (`extends EnemyBase`) is **the one enemy with real script logic**
   — seeks the nearest IDLE `RescueObject`, dives, `threaten()`s, latches, then
   `carry()`s upward. Reaching `carry_off_y` still carrying = `carried_off()`
@@ -118,9 +128,8 @@ Revenger specifics live in `games/revenger/rescue/` and `games/revenger/enemies/
   inherited from `EnemyBase` untouched.
 - `mutant` is just another data-driven `EnemyDefinition` (`mutant.tres`) — no
   new framework, same as grunt/gunner/heavy.
-- All art here is **placeholder** (capsule humanoid, gunner/swarmer meshes reused
-  for captor/mutant) until the owner's 4 VRoid humanoids + from-a-human mutant
-  model exist — swapping them in is a mesh/AnimationPlayer change, no logic.
+- Captor/mutant art is still **placeholder** (gunner/swarmer meshes reused) —
+  the owner's mutant-ship blockout is in Blender but not yet ready to export.
 
 `tests/rescue_check.tscn` is the acceptance test (state machine + the real
 captor→mutation pipeline). `tests/rescue_playtest.tscn` is a watch-it scene
