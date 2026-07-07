@@ -1,0 +1,24 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://games/revenger/weapons/laser_bolt.gd" id="1_script"]
+[ext_resource type="Shader" path="res://games/revenger/shaders/laser_bolt.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bolt"]
+render_priority = 1
+shader = ExtResource("2_shader")
+
+[sub_resource type="BoxMesh" id="BoxMesh_bolt"]
+size = Vector3(0.35, 0.35, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape_bolt"]
+size = Vector3(0.6, 0.6, 8)
+
+[node name="LaserBolt" type="Area3D"]
+script = ExtResource("1_script")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_bolt")
+material_override = SubResource("ShaderMaterial_bolt")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_bolt")

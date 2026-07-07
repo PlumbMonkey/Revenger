@@ -85,7 +85,11 @@ flows. Keep this scene passing; extend it as phases land.
 1. Scaffolding & autoloads — **DONE** (shell + boot check)
 2. Wave spawner & data-driven enemies — **DONE** (built via VS Code Copilot/Sonnet 4.6
    from `docs/PHASE2_SPEC.md`, verified headless in this session)
-3. VFX & particle pooling (`VFXManager.burst()` API is final, body is a stub)
+3. VFX & particle pooling — **CORE DONE**: VFXManager pools registered burst scenes
+   (round-robin GPUParticles3D, `register_burst()` at game boot; burst scenes are
+   game art, e.g. `games/revenger/vfx/laser_impact_burst.tscn`). Defender-style
+   laser lives in `games/revenger/weapons/laser_bolt.tscn` (+ hue-cycling shader);
+   `tests/laser_demo.tscn` is the visual demo + headless check. Screen shake still pending.
 4. Scoring & HUD (`ScoreManager` logic works; HUD scenes are stubs) — also owns
    the pause menu + settings screen with control-scheme selector (see Input above)
 5. Pickup/rescue state machine (idle → threatened → carried → rescued)
