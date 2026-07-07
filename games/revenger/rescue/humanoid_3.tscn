@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+; Smallest of the 4 (~1.36 raw units vs ~1.6-1.79 for the others) — the child model.
+
+[ext_resource type="Script" path="res://games/revenger/rescue/humanoid.gd" id="1_humanoid"]
+[ext_resource type="PackedScene" uid="uid://crq6samghv0ix" path="res://games/revenger/assets/Revenger. humanoid 3.glb" id="2_model"]
+
+[node name="Humanoid3" type="Node3D"]
+script = ExtResource("1_humanoid")
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+transform = Transform3D(5.72, 0, 0, 0, 5.72, 0, 0, 0, 5.72, 0, 0, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

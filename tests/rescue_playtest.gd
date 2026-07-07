@@ -5,7 +5,12 @@ extends Node3D
 ## Not a pass/fail check — F6 this scene to look at it. (Headless: auto-quits.)
 
 const LEVEL_RESCUE_DEMO := "res://games/revenger/levels/level_rescue_demo.tres"
-const HUMANOID_SCENE: PackedScene = preload("res://games/revenger/rescue/humanoid.tscn")
+const HUMANOID_SCENES: Array[PackedScene] = [
+	preload("res://games/revenger/rescue/humanoid_1.tscn"),
+	preload("res://games/revenger/rescue/humanoid_2.tscn"),
+	preload("res://games/revenger/rescue/humanoid_3.tscn"),
+	preload("res://games/revenger/rescue/humanoid_4.tscn"),
+]
 const PULSE_IMPACT := preload("res://games/revenger/vfx/pulse_impact_burst.tscn")
 
 
@@ -13,9 +18,10 @@ func _ready() -> void:
 	VFXManager.register_burst(&"pulse_impact", PULSE_IMPACT)
 	VFXManager.register_burst(&"smash", PULSE_IMPACT)  # placeholder until a dedicated smash burst exists
 
-	# 5 humanoids scattered on the ground, per the spec.
+	# 5 humanoids scattered on the ground, per the spec — cycling through the
+	# 4 real characters (2 male, female, child).
 	for i in 5:
-		var h: RescueObject = HUMANOID_SCENE.instantiate()
+		var h: RescueObject = HUMANOID_SCENES[i % HUMANOID_SCENES.size()].instantiate()
 		add_child(h)
 		h.global_position = Vector3(-20 + i * 10, 0, 0)
 
