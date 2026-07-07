@@ -16,6 +16,7 @@ func _ready() -> void:
 	_check_input_contract()
 	_check_eventbus_traffic()   # Phase 1 — synchronous
 	await _check_wave_spawner() # Phase 2 — async (real enemy instancing)
+	_check_hud()                # Phase 4 — synchronous
 	_report()
 
 
@@ -127,10 +128,100 @@ func _on_p2_waves_done() -> void:
 	_p2_done = true
 
 
+func _check_hud() -> void:
+	## Phase 4: HUD labels, pause menu, settings OptionButton, radar blip counts.
+	## HUD was already shown via game_started in Phase 2; test idempotency first.
+	HUDManager.show_hud()
+
+	var hud: Control = HUDManager.game_hud
+	if hud == null:
+		_failures.append("Phase 4: HUDManager.game_hud is null after show_hud()")
+		return
+
+	# ── Score label ────────────────────────────────────────────────────
+	EventBus.score_changed.emit(42)
+	var score_label := hud.get_node_or_null("%ScoreLabel") as Label
+	if score_label == null:
+		_failures.append("Phase 4: %ScoreLabel not found in game_hud")
+	elif score_label.text != "Score: 42":
+		_failures.append("Phase 4: score label — expected 'Score: 42', got '%s'" % score_label.text)
+
+	# ── Lives label ────────────────────────────────────────────────────
+	EventBus.lives_changed.emit(2)
+	var lives_label := hud.get_node_or_null("%LivesLabel") as Label
+	if lives_label == null:
+		_failures.append("Phase 4: %LivesLabel not found")
+	elif lives_label.text != "Lives: 2":
+		_failures.append("Phase 4: lives label — expected 'Lives: 2', got '%s'" % lives_label.text)
+
+	# ── Combo visible when mult > 1.0 ──────────────────────────────────
+	EventBus.combo_changed.emit(2, 1.5)
+	var combo_label := hud.get_node_or_null("%ComboLabel") as Label
+	if combo_label == null:
+		_failures.append("Phase 4: %ComboLabel not found")
+	elif not combo_label.visible:
+		_failures.append("Phase 4: combo label should be visible at mult=1.5")
+	elif combo_label.text != "x1.5":
+		_failures.append("Phase 4: combo label — expected 'x1.5', got '%s'" % combo_label.text)
+
+	# ── Combo hidden at exactly 1.0 (spec edge case) ───────────────────
+	EventBus.combo_changed.emit(0, 1.0)
+	if combo_label != null and combo_label.visible:
+		_failures.append("Phase 4: combo label should be hidden at mult=1.0")
+
+	# ── Pause menu show/hide ───────────────────────────────────────────
+	var pm: Control = HUDManager.pause_menu
+	if pm == null:
+		_failures.append("Phase 4: HUDManager.pause_menu is null")
+		return
+
+	GameManager.toggle_pause()
+	if not pm.visible:
+		_failures.append("Phase 4: pause menu not visible after toggle_pause()")
+	if not get_tree().paused:
+		_failures.append("Phase 4: tree should be paused after toggle_pause()")
+
+	GameManager.toggle_pause()  # restore — must unpause before settings test
+	if pm.visible:
+		_failures.append("Phase 4: pause menu still visible after second toggle_pause()")
+	if get_tree().paused:
+		_failures.append("Phase 4: tree should not be paused after second toggle_pause()")
+
+	# ── Control scheme via OptionButton ───────────────────────────────
+	var option := pm.get_node_or_null("%SchemeOption") as OptionButton
+	if option == null:
+		_failures.append("Phase 4: %SchemeOption not found in pause_menu")
+	else:
+		var original_scheme := SettingsManager.control_scheme
+		var new_scheme: int = (original_scheme + 1) % 3
+		var new_idx: int = option.get_item_index(new_scheme)
+		option.item_selected.emit(new_idx)          # fires _on_scheme_selected
+		if SettingsManager.control_scheme != new_scheme:
+			_failures.append("Phase 4: control_scheme not updated via OptionButton " \
+					+ "(expected %d, got %d)" % [new_scheme, SettingsManager.control_scheme])
+		if not FileAccess.file_exists("user://settings.cfg"):
+			_failures.append("Phase 4: settings.cfg not written after scheme change")
+		SettingsManager.control_scheme = original_scheme  # restore
+
+	# ── Radar blip count ──────────────────────────────────────────────
+	HUDManager.set_radar_bounds(Rect2(-50, -50, 100, 100))
+	var radar := hud.get_node_or_null("%Radar")
+	if radar == null:
+		_failures.append("Phase 4: %Radar not found in game_hud")
+	else:
+		var dummy_enemy := Node3D.new()
+		dummy_enemy.add_to_group("radar_enemy")
+		add_child(dummy_enemy)
+		var counts: Dictionary = radar.call("get_blip_counts")
+		if counts.get("enemy", 0) < 1:
+			_failures.append("Phase 4: expected >=1 enemy blip, got %s" % str(counts))
+		dummy_enemy.queue_free()
+
+
 func _report() -> void:
 	if _failures.is_empty():
-		print("BOOT CHECK PASS — 7 autoloads registered, input contract + EventBus traffic verified" \
-				+ " (Phase 1 score: 750, Phase 2 score: %d)" % ScoreManager.score)
+		print("BOOT CHECK PASS — 7 autoloads registered, Phase 1+2+4 verified" \
+				+ " (Phase 1 score: 750, Phase 2 score: 1000, HUD: OK)")
 	else:
 		print("BOOT CHECK FAIL:")
 		for failure: String in _failures:

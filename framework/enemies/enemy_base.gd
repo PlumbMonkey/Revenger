@@ -12,6 +12,10 @@ var health: float
 var _pattern: MovementController
 
 
+func _ready() -> void:
+	add_to_group("radar_enemy")
+
+
 func setup(p_definition: EnemyDefinition) -> void:
 	definition = p_definition
 	health = definition.max_health

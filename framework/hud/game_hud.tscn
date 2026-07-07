@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://framework/hud/game_hud.gd" id="1_gamehud"]
+[ext_resource type="Script" path="res://framework/hud/radar.gd" id="2_radar"]
+
+[node name="GameHud" type="Control"]
+script = ExtResource("1_gamehud")
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ScoreLabel" type="Label" parent="."]
+unique_name_in_owner = true
+
+[node name="HighScoreLabel" type="Label" parent="."]
+unique_name_in_owner = true
+
+[node name="LivesLabel" type="Label" parent="."]
+unique_name_in_owner = true
+
+[node name="WaveBanner" type="Label" parent="."]
+unique_name_in_owner = true
+
+[node name="ComboLabel" type="Label" parent="."]
+unique_name_in_owner = true
+
+[node name="RadarPanel" type="Control" parent="."]
+custom_minimum_size = Vector2(100, 100)
+
+[node name="Radar" type="Control" parent="RadarPanel"]
+unique_name_in_owner = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("2_radar")
+
+[node name="BannerTimer" type="Timer" parent="."]
+unique_name_in_owner = true
+one_shot = true
+wait_time = 2.0

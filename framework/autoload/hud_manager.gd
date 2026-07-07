@@ -1,36 +1,95 @@
 extends Node
-## Radar/minimap, score display, lives/health HUD.
-##
-## Phase 1 stub: subscribes to every signal the real HUD will render, so the
-## wiring is proven now; the actual Control scenes land in Phase 4. Games
-## register their HUD layer with register_hud() rather than building their own
-## score/lives displays.
+## HUD lifecycle and wiring: creates a CanvasLayer (layer 10), lazily
+## instantiates game_hud.tscn + pause_menu.tscn, forwards radar bounds.
+## Rendering logic lives in those scenes, not here.
+## Games may supply a replacement HUD via register_hud() before show_hud().
 
-var hud_root: Control = null
+const _GAME_HUD_SCENE := preload("res://framework/hud/game_hud.tscn")
+const _PAUSE_MENU_SCENE := preload("res://framework/hud/pause_menu.tscn")
+
+## Exposed for testing and game-code inspection (read-only by convention).
+var game_hud: Control = null
+var pause_menu: Control = null
+
+var _canvas: CanvasLayer = null
+var _custom_hud: Control = null
+var _pending_bounds: Rect2 = Rect2()
+var _has_pending_bounds: bool = false
 
 
 func _ready() -> void:
-	EventBus.score_changed.connect(_on_score_changed)
-	EventBus.combo_changed.connect(_on_combo_changed)
-	EventBus.lives_changed.connect(_on_lives_changed)
-	EventBus.wave_started.connect(_on_wave_started)
+	EventBus.game_started.connect(_on_game_started)
+	EventBus.game_paused.connect(_on_game_paused)
+	EventBus.game_over.connect(_on_game_over)
 
 
+## Lazy-instantiates the CanvasLayer + game_hud + pause_menu.
+## Idempotent: second call just un-hides the layer.
+func show_hud() -> void:
+	if _canvas != null:
+		_canvas.visible = true
+		return
+	_canvas = CanvasLayer.new()
+	_canvas.layer = 10
+	add_child(_canvas)
+
+	game_hud = _GAME_HUD_SCENE.instantiate() if _custom_hud == null else _custom_hud
+	_canvas.add_child(game_hud)
+
+	pause_menu = _PAUSE_MENU_SCENE.instantiate()
+	_canvas.add_child(pause_menu)
+
+	if _has_pending_bounds:
+		_apply_radar_bounds(_pending_bounds)
+		_has_pending_bounds = false
+
+
+func hide_hud() -> void:
+	if _canvas != null:
+		_canvas.visible = false
+
+
+## Passes world-XZ bounding rect to the radar. Stored if HUD not shown yet.
+func set_radar_bounds(bounds: Rect2) -> void:
+	if _canvas != null:
+		_apply_radar_bounds(bounds)
+	else:
+		_pending_bounds = bounds
+		_has_pending_bounds = true
+
+
+## Supply a game-skinned Control to replace the built-in game_hud.
+## Must be called before show_hud() to take effect.
 func register_hud(root: Control) -> void:
-	hud_root = root
+	_custom_hud = root
 
 
-func _on_score_changed(_score: int) -> void:
-	pass  # Phase 4: update score label
+# ---------------------------------------------------------------------------
+
+func _apply_radar_bounds(bounds: Rect2) -> void:
+	if game_hud == null:
+		return
+	var radar := game_hud.get_node_or_null("%Radar")
+	if radar != null and radar.has_method("set_world_bounds"):
+		radar.call("set_world_bounds", bounds)
 
 
-func _on_combo_changed(_combo_count: int, _multiplier: float) -> void:
-	pass  # Phase 4: update combo/multiplier display
+func _on_game_started() -> void:
+	show_hud()
 
 
-func _on_lives_changed(_lives: int) -> void:
-	pass  # Phase 4: update lives display
+func _on_game_paused(is_paused: bool) -> void:
+	if _canvas == null:
+		show_hud()  # lazy init when pause is toggled before the HUD was shown
+	if is_paused:
+		pause_menu.call("show_menu")
+	else:
+		pause_menu.call("hide_menu")
 
 
-func _on_wave_started(_wave_index: int) -> void:
-	pass  # Phase 4: wave banner / radar refresh
+func _on_game_over() -> void:
+	## If the game ends while paused: hide the pause menu and unpause the tree.
+	if get_tree().paused:
+		get_tree().paused = false
+		if pause_menu != null:
+			pause_menu.call("hide_menu")
