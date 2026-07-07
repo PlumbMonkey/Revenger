@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://c7ec6km8rocl2" path="res://games/revenger/assets/Revenger. enemy 2.glb" id="2_model"]
 
 [sub_resource type="BoxShape3D" id="BoxShape_grunt"]
-size = Vector3(2.51, 1.44, 3.4)
+size = Vector3(5.02, 1.44, 3.4)
 
 [node name="EnemyGrunt" type="CharacterBody3D"]
 collision_layer = 4

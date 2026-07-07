@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bkqgwtq3iyfm1"
-path="res://.godot/imported/Revenger__04.png-2640a4c1c8690894f911307f9367e98c.ctex"
+path.s3tc="res://.godot/imported/Revenger__04.png-2640a4c1c8690894f911307f9367e98c.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "60580e9596461604a5954ad833f9f9bd"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://games/revenger/assets/Revenger__04.png"
-dest_files=["res://.godot/imported/Revenger__04.png-2640a4c1c8690894f911307f9367e98c.ctex"]
+dest_files=["res://.godot/imported/Revenger__04.png-2640a4c1c8690894f911307f9367e98c.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0
