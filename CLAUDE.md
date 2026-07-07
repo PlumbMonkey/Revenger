@@ -132,7 +132,10 @@ flows. Keep this scene passing; extend it as phases land.
 4. Scoring & HUD — **SPEC READY: build from `docs/PHASE4_SPEC.md`** (ScoreManager
    logic already works; spec covers HUD scenes, radar, pause menu + settings
    screen with control-scheme selector — implement, don't redesign)
-5. Pickup/rescue state machine (idle → threatened → carried → rescued)
+5. Pickup/rescue state machine — **SPEC READY: build from `docs/PHASE5_SPEC.md`**
+   (framework RescueObject state machine idle→threatened→carried→falling→rescued/lost;
+   Revenger humanoid animation binding, captor carry+mutate, mutant; build with
+   placeholder art — implement, don't redesign)
 6. Movement interface impls + integration test + architecture review
    (`MovementController` base was stubbed early, in Phase 1, by design)
 
