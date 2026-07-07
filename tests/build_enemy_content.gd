@@ -5,6 +5,7 @@ extends SceneTree
 
 const TOON := "res://framework/shaders/toon.gdshader"
 const LINEAR := "res://framework/movement/patterns/linear_pattern.gd"
+const SWARM := "res://games/revenger/movement/swarm_pattern.gd"
 const PULSE := "res://games/revenger/weapons/enemy_pulse_shot.tscn"
 const LASER := "res://games/revenger/weapons/enemy_laser_bolt.tscn"
 
@@ -26,10 +27,12 @@ func _init() -> void:
 	# --- enemy definitions ---
 	# id, scene, hp, pts, speed, weapon, interval, muzzle_z, death_burst, material
 	_make_def("grunt", "enemy_grunt", 2.0, 100, 6.0, PULSE, 2.2, -2.0, &"pulse_impact", "toon_enemy_grunt")
-	# swarmer: 2 HP so it survives the first hit, then breaks apart (shrinks +
-	# bursts) and doubles speed — a wounded swarm that gets nastier.
+	# swarmer: 2 HP, flies as a tight cluster. First hit anywhere breaks the
+	# whole formation (SwarmPattern) — ships separate and speed up; a burst
+	# marks the break. No shrink/speed_mult here — the pattern does the motion.
 	_make_def("swarmer", "enemy_swarmer", 2.0, 75, 8.5, PULSE, 3.0, -3.0, &"pulse_impact", "toon_enemy_swarmer",
-		2.0, 0.6, &"pulse_impact")
+		1.0, 1.0, &"pulse_impact", SWARM,
+		{"spread_speed": 7.0, "break_boost": 1.9, "tight_drift": 1.2})
 	_make_def("gunner", "enemy_gunner", 3.0, 150, 5.0, PULSE, 1.6, -3.5, &"pulse_impact", "toon_enemy_gunner")
 	_make_def("heavy", "enemy_heavy", 10.0, 600, 3.0, LASER, 1.4, -2.6, &"laser_impact", "toon_enemy_heavy")
 
@@ -69,15 +72,17 @@ func _make_material(name: String, tint: Color, bands: int) -> void:
 func _make_def(id: String, scene_name: String, hp: float, pts: int, speed: float,
 		weapon_path: String, interval: float, muzzle_z: float,
 		death_burst: StringName, mat_name: String,
-		dmg_speed: float = 1.0, dmg_scale: float = 1.0, dmg_burst: StringName = &"") -> void:
+		dmg_speed: float = 1.0, dmg_scale: float = 1.0, dmg_burst: StringName = &"",
+		pattern_path: String = LINEAR, extra_move: Dictionary = {}) -> void:
 	var def := EnemyDefinition.new()
 	def.id = StringName(id)
 	def.display_name = id.capitalize()
 	def.scene = load(ENEMY_DIR + scene_name + ".tscn")
 	def.max_health = hp
 	def.points = pts
-	def.movement_pattern = load(LINEAR)
+	def.movement_pattern = load(pattern_path)
 	def.movement_params = {"direction": Vector3(0, 0, -1), "speed": speed}
+	def.movement_params.merge(extra_move)
 	def.weapon_scene = load(weapon_path)
 	def.fire_interval = interval
 	def.muzzle_offset = Vector3(0, 0, muzzle_z)

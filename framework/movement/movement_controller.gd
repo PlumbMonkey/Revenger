@@ -51,3 +51,9 @@ func compute_velocity(current_velocity: Vector3, _delta: float) -> Vector3:
 ## per-frame velocity flow.
 func handle_action(_action: StringName) -> void:
 	pass
+
+
+## Called by the actor the first time it survives a hit. Patterns may change
+## behaviour in response — e.g. a swarm breaking formation. No-op by default.
+func on_damaged() -> void:
+	pass

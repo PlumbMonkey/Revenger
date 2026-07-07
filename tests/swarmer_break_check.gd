@@ -1,6 +1,7 @@
 extends Node3D
-## Verifies the swarmer's damage reaction: survives the first hit, breaks apart
-## (shrinks) and doubles speed, then dies on the second hit.
+## Verifies swarm-scatter: 3 swarmers spawn as a tight cluster; ONE hit breaks
+## the whole formation (all separate + speed up); the hit ship survives its
+## first hit and dies on the second.
 
 const SWARMER_DEF := "res://games/revenger/enemies/swarmer.tres"
 const PULSE_IMPACT := preload("res://games/revenger/vfx/pulse_impact_burst.tscn")
@@ -10,54 +11,70 @@ var _failures: PackedStringArray = []
 
 func _ready() -> void:
 	VFXManager.register_burst(&"pulse_impact", PULSE_IMPACT)
-
 	var def: EnemyDefinition = load(SWARMER_DEF)
 	if def.max_health < 2.0:
-		_failures.append("swarmer max_health is %.1f — must be >= 2 to survive a hit" % def.max_health)
+		_failures.append("swarmer max_health %.1f — must be >= 2 to survive a hit" % def.max_health)
 
-	var enemy: EnemyBase = (def.scene as PackedScene).instantiate()
-	enemy.setup(def)
-	add_child(enemy)
-	enemy.global_position = Vector3.ZERO
+	# Spawn a tight cluster of 3 (same spot, like a real set-of-3).
+	var swarm: Array[EnemyBase] = []
+	var patterns: Array = []
+	for i in 3:
+		var e: EnemyBase = (def.scene as PackedScene).instantiate()
+		e.setup(def)
+		add_child(e)
+		e.global_position = Vector3(i * 0.5, 0, 0)  # within BREAK_RADIUS
+		swarm.append(e)
+		for c in e.get_children():
+			if c is SwarmPattern:
+				patterns.append(c)
 
-	var pattern: MovementController = null
-	for c in enemy.get_children():
-		if c is MovementController:
-			pattern = c
-	if pattern == null:
-		_failures.append("swarmer has no MovementController child")
+	if patterns.size() != 3:
+		_failures.append("expected 3 SwarmPatterns, found %d" % patterns.size())
+		_report(); return
 
-	await _run(enemy, pattern)
+	await _run(swarm, patterns)
 	_report()
 
 
-func _run(enemy: EnemyBase, pattern: MovementController) -> void:
-	# --- first hit: should survive, shrink, and speed up ---
-	enemy.take_hit(1.0)
+func _run(swarm: Array[EnemyBase], patterns: Array) -> void:
+	# All start in formation.
+	for p in patterns:
+		if p.is_broken():
+			_failures.append("a swarmer was broken before any hit")
+
+	var v_tight: Vector3 = patterns[1].compute_velocity(Vector3.ZERO, 0.016)
+
+	# ONE hit on swarm[0] should break the WHOLE cluster.
+	swarm[0].take_hit(1.0)
 	await get_tree().process_frame
 
-	if not is_instance_valid(enemy) or enemy.is_queued_for_deletion():
-		_failures.append("swarmer died on the FIRST hit (should survive with 2 HP)")
-		return
+	for i in patterns.size():
+		if not patterns[i].is_broken():
+			_failures.append("swarmer %d did not break formation after cluster hit" % i)
 
-	if not is_equal_approx(enemy.scale.x, 0.6):
-		_failures.append("swarmer did not shrink on first hit (scale.x=%.2f, want 0.6)" % enemy.scale.x)
-	if pattern != null and not is_equal_approx(pattern.speed_scale, 2.0):
-		_failures.append("swarmer speed not doubled (speed_scale=%.2f, want 2.0)" % pattern.speed_scale)
+	# Broken ships move faster and fan sideways vs the tight forward drift.
+	var v_broken: Vector3 = patterns[1].compute_velocity(Vector3.ZERO, 0.016)
+	if v_broken.length() <= v_tight.length():
+		_failures.append("broken swarmer did not speed up (%.1f vs %.1f)" % [v_broken.length(), v_tight.length()])
+	if absf(v_broken.x) <= absf(v_tight.x) + 0.5:
+		_failures.append("broken swarmer did not spread sideways")
 
-	# --- second hit: should die ---
-	enemy.take_hit(1.0)
-	await get_tree().process_frame
-	await get_tree().process_frame
-	if is_instance_valid(enemy) and not enemy.is_queued_for_deletion():
-		_failures.append("swarmer survived the SECOND hit (should die)")
+	# Hit ship survived its first hit; dies on the second.
+	if not is_instance_valid(swarm[0]) or swarm[0].is_queued_for_deletion():
+		_failures.append("hit swarmer died on the FIRST hit (should survive with 2 HP)")
+	else:
+		swarm[0].take_hit(1.0)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		if is_instance_valid(swarm[0]) and not swarm[0].is_queued_for_deletion():
+			_failures.append("swarmer survived the SECOND hit (should die)")
 
 
 func _report() -> void:
 	if _failures.is_empty():
-		print("SWARMER BREAK CHECK PASS — survives first hit, shrinks + doubles speed, dies on second")
+		print("SWARM SCATTER CHECK PASS — one hit breaks the tight cluster, all spread + speed up, hit ship dies on 2nd")
 	else:
-		print("SWARMER BREAK CHECK FAIL:")
+		print("SWARM SCATTER CHECK FAIL:")
 		for f in _failures:
 			print("  - ", f)
 	if DisplayServer.get_name() == "headless":

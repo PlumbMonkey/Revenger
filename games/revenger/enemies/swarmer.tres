@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EnemyDefinition" format=3]
 
 [ext_resource type="Material" path="res://games/revenger/enemies/materials/toon_enemy_swarmer.tres" id="1_55n1q"]
-[ext_resource type="Script" path="res://framework/movement/patterns/linear_pattern.gd" id="2_fuo1p"]
+[ext_resource type="Script" path="res://games/revenger/movement/swarm_pattern.gd" id="2_fuo1p"]
 [ext_resource type="PackedScene" path="res://games/revenger/enemies/enemy_swarmer.tscn" id="3_inuiw"]
 [ext_resource type="Script" path="res://framework/data/enemy_definition.gd" id="4_nuaug"]
 [ext_resource type="PackedScene" path="res://games/revenger/weapons/enemy_pulse_shot.tscn" id="5_p0hf3"]
@@ -15,8 +15,11 @@ max_health = 2.0
 points = 75
 movement_pattern = ExtResource("2_fuo1p")
 movement_params = {
+"break_boost": 1.9,
 "direction": Vector3(0, 0, -1),
-"speed": 8.5
+"speed": 8.5,
+"spread_speed": 7.0,
+"tight_drift": 1.2
 }
 death_burst = &"pulse_impact"
 hit_flash = &"pulse_impact"
@@ -24,6 +27,4 @@ weapon_scene = ExtResource("5_p0hf3")
 fire_interval = 3.0
 muzzle_offset = Vector3(0, 0, -3)
 material_override = ExtResource("1_55n1q")
-damaged_speed_mult = 2.0
-damaged_scale = 0.6
 damaged_burst = &"pulse_impact"

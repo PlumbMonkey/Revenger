@@ -54,8 +54,10 @@ func _react_to_damage() -> void:
 	_damaged_reacted = true
 	if definition.damaged_burst != &"":
 		EventBus.vfx_burst_requested.emit(definition.damaged_burst, global_position)
-	if _pattern != null and definition.damaged_speed_mult != 1.0:
-		_pattern.speed_scale = definition.damaged_speed_mult
+	if _pattern != null:
+		_pattern.on_damaged()
+		if definition.damaged_speed_mult != 1.0:
+			_pattern.speed_scale = definition.damaged_speed_mult
 	if definition.damaged_scale != 1.0:
 		scale = Vector3.ONE * definition.damaged_scale
 
