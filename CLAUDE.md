@@ -193,8 +193,13 @@ flows. Keep this scene passing; extend it as phases land.
    control-scheme settings panel, `hud_manager.gd` rewrite; verified headless)
 5. Pickup/rescue state machine — **DONE** (built from `docs/PHASE5_SPEC.md`;
    see "Rescue mechanic" below; verified headless)
-6. Movement interface impls + integration test + architecture review
-   (`MovementController` base was stubbed early, in Phase 1, by design)
+6. Movement interface + player ship + integration — **SPEC READY: build from
+   `docs/PHASE6_SPEC.md`** (final framework phase). Game-specific PlayerShip +
+   ThrustFlightController (reuses the `MovementController` contract stubbed in
+   Phase 1), fires the existing laser, catches falling humanoids via
+   `RescueObject.catch()`, takes hits; `VFXManager` camera shake finishes
+   Phase 3; integration scene + headless check + architecture review. Build with
+   placeholder ship art — implement, don't redesign.
 
 ## Process
 
