@@ -6,12 +6,13 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bolt"]
 render_priority = 1
 shader = ExtResource("2_shader")
+shader_parameter/bolt_length = 12.0
 
 [sub_resource type="BoxMesh" id="BoxMesh_bolt"]
-size = Vector3(0.35, 0.35, 8)
+size = Vector3(0.16, 0.16, 12)
 
 [sub_resource type="BoxShape3D" id="BoxShape_bolt"]
-size = Vector3(0.6, 0.6, 8)
+size = Vector3(0.5, 0.5, 12)
 
 [node name="LaserBolt" type="Area3D"]
 script = ExtResource("1_script")
