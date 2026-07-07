@@ -42,3 +42,11 @@ extends Resource
 ## Lets imported glTF ships (flat/untextured from Blender) get the shared toon
 ## material at spawn — art stays flat in Blender, styled here per the pipeline.
 @export var material_override: Material
+
+## Damage reaction (fires once, the first time the enemy is hit but survives).
+## Defaults are no-ops. Set these so an enemy with max_health > 1 "breaks apart
+## and speeds up" on its first hit: speed multiplier, a visual shrink, and a
+## burst. Reusable across all three games — a wounded-enrage arcade staple.
+@export var damaged_speed_mult: float = 1.0
+@export var damaged_scale: float = 1.0
+@export var damaged_burst: StringName = &""

@@ -23,6 +23,11 @@ var actor: Node3D
 ## comes straight from EnemyDefinition.movement_params.
 var params: Dictionary = {}
 
+## Runtime multiplier on the pattern's speed. Actors set this to accelerate or
+## slow a mover without re-tuning params (e.g. an enemy enraging on damage).
+## Patterns that move should multiply their speed by this.
+var speed_scale: float = 1.0
+
 
 func setup(p_actor: Node3D, p_params: Dictionary = {}) -> void:
 	actor = p_actor

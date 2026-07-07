@@ -10,6 +10,7 @@ extends CharacterBody3D
 var definition: EnemyDefinition
 var health: float
 var _pattern: MovementController
+var _damaged_reacted: bool = false
 
 
 func _ready() -> void:
@@ -41,6 +42,22 @@ func take_hit(damage: float) -> void:
 	EventBus.vfx_burst_requested.emit(definition.hit_flash, global_position)
 	if health <= 0.0:
 		die()
+	else:
+		_react_to_damage()
+
+
+## First surviving hit only: break apart (burst + shrink) and speed up.
+## All three effects are opt-in via EnemyDefinition; no-op by default.
+func _react_to_damage() -> void:
+	if _damaged_reacted:
+		return
+	_damaged_reacted = true
+	if definition.damaged_burst != &"":
+		EventBus.vfx_burst_requested.emit(definition.damaged_burst, global_position)
+	if _pattern != null and definition.damaged_speed_mult != 1.0:
+		_pattern.speed_scale = definition.damaged_speed_mult
+	if definition.damaged_scale != 1.0:
+		scale = Vector3.ONE * definition.damaged_scale
 
 
 func die() -> void:

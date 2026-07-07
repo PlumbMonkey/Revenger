@@ -26,7 +26,10 @@ func _init() -> void:
 	# --- enemy definitions ---
 	# id, scene, hp, pts, speed, weapon, interval, muzzle_z, death_burst, material
 	_make_def("grunt", "enemy_grunt", 2.0, 100, 6.0, PULSE, 2.2, -2.0, &"pulse_impact", "toon_enemy_grunt")
-	_make_def("swarmer", "enemy_swarmer", 1.0, 75, 8.5, PULSE, 3.0, -3.0, &"pulse_impact", "toon_enemy_swarmer")
+	# swarmer: 2 HP so it survives the first hit, then breaks apart (shrinks +
+	# bursts) and doubles speed — a wounded swarm that gets nastier.
+	_make_def("swarmer", "enemy_swarmer", 2.0, 75, 8.5, PULSE, 3.0, -3.0, &"pulse_impact", "toon_enemy_swarmer",
+		2.0, 0.6, &"pulse_impact")
 	_make_def("gunner", "enemy_gunner", 3.0, 150, 5.0, PULSE, 1.6, -3.5, &"pulse_impact", "toon_enemy_gunner")
 	_make_def("heavy", "enemy_heavy", 10.0, 600, 3.0, LASER, 1.4, -2.6, &"laser_impact", "toon_enemy_heavy")
 
@@ -65,7 +68,8 @@ func _make_material(name: String, tint: Color, bands: int) -> void:
 
 func _make_def(id: String, scene_name: String, hp: float, pts: int, speed: float,
 		weapon_path: String, interval: float, muzzle_z: float,
-		death_burst: StringName, mat_name: String) -> void:
+		death_burst: StringName, mat_name: String,
+		dmg_speed: float = 1.0, dmg_scale: float = 1.0, dmg_burst: StringName = &"") -> void:
 	var def := EnemyDefinition.new()
 	def.id = StringName(id)
 	def.display_name = id.capitalize()
@@ -80,6 +84,9 @@ func _make_def(id: String, scene_name: String, hp: float, pts: int, speed: float
 	def.death_burst = death_burst
 	def.hit_flash = death_burst
 	def.material_override = load(MAT_DIR + mat_name + ".tres")
+	def.damaged_speed_mult = dmg_speed
+	def.damaged_scale = dmg_scale
+	def.damaged_burst = dmg_burst
 	ResourceSaver.save(def, ENEMY_DIR + id + ".tres")
 
 

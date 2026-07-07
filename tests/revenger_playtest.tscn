@@ -1,17 +1,17 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://jwgqhg6pglo5"]
 
-[ext_resource type="Script" path="res://tests/revenger_playtest.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://doi4qu88e4p7b" path="res://tests/revenger_playtest.gd" id="1_script"]
 
-[node name="RevengerPlaytest" type="Node3D"]
+[node name="RevengerPlaytest" type="Node3D" unique_id=1536517974]
 script = ExtResource("1_script")
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=2028421919]
 transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 46, 34)
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1030004326]
 transform = Transform3D(0.7, -0.5, 0.5, 0, 0.7, 0.7, -0.7, -0.5, 0.5, 0, 20, 0)
 light_energy = 0.6
 
-[node name="Fill" type="DirectionalLight3D" parent="."]
+[node name="Fill" type="DirectionalLight3D" parent="." unique_id=317245579]
 transform = Transform3D(-0.7, -0.3, -0.6, 0, 0.9, -0.44, 0.7, -0.3, -0.6, 0, 20, 0)
 light_energy = 0.25
