@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, blend_add, cull_disabled;
+render_mode unshaded, blend_add, cull_back;
 
 // Defender-style bolt: long thin additive streak cycling through a hand-picked
 // 80s neon palette — hot pink, laser orange, neon yellow, neon green, electric
@@ -11,8 +11,10 @@ uniform float bolt_length = 12.0;
 uniform float hue_cycles : hint_range(0.5, 6.0) = 2.5;    // neon bands visible at once
 uniform float hue_speed : hint_range(0.0, 10.0) = 2.5;    // color flow speed
 uniform float morph_amount : hint_range(0.0, 0.6) = 0.25; // sine wobble = fluid morphing
-uniform float intensity : hint_range(0.5, 8.0) = 4.0;
-uniform float core_radius = 0.08;
+// Keep intensity near 1 — additive blending overexposes saturated color to
+// white fast; neon reads as neon only when the channels stay in range.
+uniform float intensity : hint_range(0.5, 8.0) = 1.7;
+uniform float core_radius = 0.03;
 
 varying vec3 local_pos;
 
@@ -45,7 +47,7 @@ void fragment() {
 			+ morph_amount * 0.5 * sin(TIME * 3.1 - along * 4.0);
 	vec3 neon = neon_palette(t);
 	float core = 1.0 - smoothstep(0.0, core_radius * 2.0, length(local_pos.xy));
-	vec3 color = mix(neon, vec3(1.0), core * 0.55);
+	vec3 color = mix(neon, vec3(1.0), core * 0.3);
 	// fade the tail (+Z end) so the bolt reads as streaking forward
 	float tail_fade = smoothstep(1.0, 0.55, along);
 	ALBEDO = color * intensity;
