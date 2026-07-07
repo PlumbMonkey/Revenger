@@ -88,10 +88,10 @@ defs + levels via ResourceSaver — edit stats there, not the `.tres` by hand).
 `tests/revenger_playtest.tscn` is a watch-it-fly scene (F6). NOTE: scene timers
 run in real wall-clock even headless, so level checks need a generous deadline.
 
-> **`Revenger. enemy 1.glb` is a mis-export — it's the hero ship + pilot, not an
-> enemy** (materials prove it: Hull_Primary, Canopy_Glass, Gun_Metal + VRoid).
-> `enemy_heavy.tscn` uses enemy 2's mesh scaled 2.2x as a placeholder until the
-> real enemy-1 model is re-exported; swap the Model instance's PackedScene then.
+> **`Revenger. enemy 1.glb` is a dead mis-export — it's the hero ship + pilot,
+> not an enemy** (Hull_Primary, Canopy_Glass, Gun_Metal + VRoid materials, 11MB).
+> The real heavy is `Revenger. enemy 1v2.glb`, now wired into `enemy_heavy.tscn`.
+> `enemy 1.glb` + its ~18 VRoid character PNGs are unused repo bloat, safe to delete.
 
 ## Visual style: stylized flat/toon
 

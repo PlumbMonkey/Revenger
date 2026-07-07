@@ -28,7 +28,7 @@ func _init() -> void:
 	_make_def("grunt", "enemy_grunt", 2.0, 100, 6.0, PULSE, 2.2, -2.0, &"pulse_impact", "toon_enemy_grunt")
 	_make_def("swarmer", "enemy_swarmer", 1.0, 75, 8.5, PULSE, 3.0, -3.0, &"pulse_impact", "toon_enemy_swarmer")
 	_make_def("gunner", "enemy_gunner", 3.0, 150, 5.0, PULSE, 1.6, -3.5, &"pulse_impact", "toon_enemy_gunner")
-	_make_def("heavy", "enemy_heavy", 10.0, 600, 3.0, LASER, 1.4, -5.0, &"laser_impact", "toon_enemy_heavy")
+	_make_def("heavy", "enemy_heavy", 10.0, 600, 3.0, LASER, 1.4, -2.6, &"laser_impact", "toon_enemy_heavy")
 
 	# --- levels (WaveSets). swarmer always spawns in sets of 3 per design. ---
 	_make_level("level_1", [

@@ -22,5 +22,5 @@ death_burst = &"laser_impact"
 hit_flash = &"laser_impact"
 weapon_scene = ExtResource("5_fq081")
 fire_interval = 1.4
-muzzle_offset = Vector3(0, 0, -5)
+muzzle_offset = Vector3(0, 0, -2.6)
 material_override = ExtResource("1_irc2s")

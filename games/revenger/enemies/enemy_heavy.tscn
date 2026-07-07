@@ -1,15 +1,10 @@
 [gd_scene load_steps=4 format=3]
 
-; HEAVY HITTER — PLACEHOLDER MESH. "Revenger. enemy 1.glb" is actually the
-; hero ship + pilot (mis-export), so this uses enemy 2's mesh scaled 2.2x as
-; a stand-in. Swap the Model instance's PackedScene to the real enemy-1 glb
-; once it's re-exported; nothing else here needs to change.
-
 [ext_resource type="Script" path="res://framework/enemies/enemy_base.gd" id="1_base"]
-[ext_resource type="PackedScene" uid="uid://c7ec6km8rocl2" path="res://games/revenger/assets/Revenger. enemy 2.glb" id="2_model"]
+[ext_resource type="PackedScene" uid="uid://bjp4tn6x28ia1" path="res://games/revenger/assets/Revenger. enemy 1v2.glb" id="2_model"]
 
 [sub_resource type="BoxShape3D" id="BoxShape_heavy"]
-size = Vector3(5.52, 3.17, 7.48)
+size = Vector3(3.12, 1.88, 3.63)
 
 [node name="EnemyHeavy" type="CharacterBody3D"]
 collision_layer = 4
@@ -17,7 +12,6 @@ collision_mask = 1
 script = ExtResource("1_base")
 
 [node name="Model" parent="." instance=ExtResource("2_model")]
-transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 2.2, 0, 0, 0)
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape_heavy")
