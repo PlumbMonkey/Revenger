@@ -90,8 +90,9 @@ flows. Keep this scene passing; extend it as phases land.
    game art, e.g. `games/revenger/vfx/laser_impact_burst.tscn`). Defender-style
    laser lives in `games/revenger/weapons/laser_bolt.tscn` (+ hue-cycling shader);
    `tests/laser_demo.tscn` is the visual demo + headless check. Screen shake still pending.
-4. Scoring & HUD (`ScoreManager` logic works; HUD scenes are stubs) — also owns
-   the pause menu + settings screen with control-scheme selector (see Input above)
+4. Scoring & HUD — **SPEC READY: build from `docs/PHASE4_SPEC.md`** (ScoreManager
+   logic already works; spec covers HUD scenes, radar, pause menu + settings
+   screen with control-scheme selector — implement, don't redesign)
 5. Pickup/rescue state machine (idle → threatened → carried → rescued)
 6. Movement interface impls + integration test + architecture review
    (`MovementController` base was stubbed early, in Phase 1, by design)
