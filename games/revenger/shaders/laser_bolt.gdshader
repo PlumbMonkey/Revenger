@@ -13,7 +13,7 @@ uniform float hue_speed : hint_range(0.0, 10.0) = 2.5;    // color flow speed
 uniform float morph_amount : hint_range(0.0, 0.6) = 0.25; // sine wobble = fluid morphing
 // Keep intensity near 1 — additive blending overexposes saturated color to
 // white fast; neon reads as neon only when the channels stay in range.
-uniform float intensity : hint_range(0.5, 8.0) = 1.7;
+uniform float intensity : hint_range(0.5, 8.0) = 2.2;
 uniform float core_radius = 0.03;
 
 varying vec3 local_pos;
