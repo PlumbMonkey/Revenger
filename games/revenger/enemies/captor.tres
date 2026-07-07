@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" format=3]
+
+[ext_resource type="Material" path="res://games/revenger/enemies/materials/toon_enemy_captor.tres" id="1_luduv"]
+[ext_resource type="Script" path="res://framework/movement/patterns/linear_pattern.gd" id="2_6y2ej"]
+[ext_resource type="PackedScene" path="res://games/revenger/enemies/enemy_captor.tscn" id="3_jyv40"]
+[ext_resource type="Script" path="res://framework/data/enemy_definition.gd" id="4_omq26"]
+[ext_resource type="PackedScene" path="res://games/revenger/weapons/enemy_pulse_shot.tscn" id="5_eb3w4"]
+
+[resource]
+script = ExtResource("4_omq26")
+id = &"captor"
+display_name = "Captor"
+scene = ExtResource("3_jyv40")
+max_health = 2.0
+points = 50
+movement_pattern = ExtResource("2_6y2ej")
+movement_params = {
+"direction": Vector3(0, 0, -1),
+"speed": 4.0
+}
+death_burst = &"pulse_impact"
+hit_flash = &"pulse_impact"
+weapon_scene = ExtResource("5_eb3w4")
+material_override = ExtResource("1_luduv")

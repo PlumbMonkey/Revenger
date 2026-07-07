@@ -93,6 +93,56 @@ run in real wall-clock even headless, so level checks need a generous deadline.
 > The real heavy is `Revenger. enemy 1v2.glb`, now wired into `enemy_heavy.tscn`.
 > `enemy 1.glb` + its ~18 VRoid character PNGs are unused repo bloat, safe to delete.
 
+## Rescue mechanic (Defender-style, Phase 5)
+
+`framework/rescue/rescue_object.gd` (`RescueObject`, game-agnostic) is the state
+machine: `IDLE → THREATENED → CARRIED → FALLING → RESCUED/LOST` (terminal). Y is
+up; captors lift along +Y, humanoids fall along −Y to `ground_y`. A fall of
+`safe_fall_height` or less survives (boundary inclusive); more smashes. Games
+drive visuals via the `_on_state_changed()` virtual hook — the base class knows
+nothing about VRoid, captors, or mutants. Instances self-register to the
+`radar_pickup` group (Phase 4 radar already draws it).
+
+Revenger specifics live in `games/revenger/rescue/` and `games/revenger/enemies/`:
+- `humanoid.gd` (`extends RescueObject`) binds states to an `AnimationPlayer`
+  clip contract — **`run` / `struggle` / `fall` / `wave` / `smashed`**. Author
+  these once on a shared VRM rig; they play on all 4 humanoid models. Missing
+  clips no-op (`has_animation` guarded), so the capsule placeholder works today.
+- `captor.gd` (`extends EnemyBase`) is **the one enemy with real script logic**
+  — seeks the nearest IDLE `RescueObject`, dives, `threaten()`s, latches, then
+  `carry()`s upward. Reaching `carry_off_y` still carrying = `carried_off()`
+  (human LOST) **and the captor mutates** into `mutant_definition`
+  (`EnemyDefinition`, data — swap the mutant there) at the same spot, then frees
+  itself. Dying while carrying releases the target first (it falls, catchable).
+  No target ever found → falls back to its own `movement_pattern` (straggler),
+  inherited from `EnemyBase` untouched.
+- `mutant` is just another data-driven `EnemyDefinition` (`mutant.tres`) — no
+  new framework, same as grunt/gunner/heavy.
+- All art here is **placeholder** (capsule humanoid, gunner/swarmer meshes reused
+  for captor/mutant) until the owner's 4 VRoid humanoids + from-a-human mutant
+  model exist — swapping them in is a mesh/AnimationPlayer change, no logic.
+
+`tests/rescue_check.tscn` is the acceptance test (state machine + the real
+captor→mutation pipeline). `tests/rescue_playtest.tscn` is a watch-it scene
+(F6) — humanoids scattered on the ground, captors run through
+`level_rescue_demo.tres` via the real `WaveSpawner`; it force-kills one captor
+mid-carry at t=7s so the demo shows both outcomes (a catch and a mutation)
+without a player ship yet (Phase 6 wires the real trigger for `catch()`).
+
+**Known unhandled edges:** the mutant spawned by `_mutate()` isn't tracked by
+`WaveSpawner` (not `_do_spawn`-spawned, so it doesn't count toward
+`ALL_DEFEATED`/`live_enemy_count`) — intentional-ish (mutants roam free of wave
+pacing in real Defender too) but worth a deliberate decision later, not an
+accident. `catch()` has no automatic trigger yet — it's a public method ready
+for Phase 6's player ship (e.g. an `Area3D`) to call; nothing calls it
+automatically today outside tests/demos. A dedicated "smash" VFX burst doesn't
+exist yet (placeholder reuses `pulse_impact`).
+
+**Reuse check:** `framework/rescue/` contains zero game-specific names — the
+Joust-alike/Robotron-alike can reuse `RescueObject` (or ignore it entirely)
+with no framework edits; every Revenger-specific piece (VRoid binding, captor
+carry+mutate, mutant) lives in `games/revenger/`.
+
 ## Visual style: stylized flat/toon
 
 All three games share one NPR look via `framework/shaders/toon.gdshader` — a
@@ -129,13 +179,11 @@ flows. Keep this scene passing; extend it as phases land.
    game art, e.g. `games/revenger/vfx/laser_impact_burst.tscn`). Defender-style
    laser lives in `games/revenger/weapons/laser_bolt.tscn` (+ hue-cycling shader);
    `tests/laser_demo.tscn` is the visual demo + headless check. Screen shake still pending.
-4. Scoring & HUD — **SPEC READY: build from `docs/PHASE4_SPEC.md`** (ScoreManager
-   logic already works; spec covers HUD scenes, radar, pause menu + settings
-   screen with control-scheme selector — implement, don't redesign)
-5. Pickup/rescue state machine — **SPEC READY: build from `docs/PHASE5_SPEC.md`**
-   (framework RescueObject state machine idle→threatened→carried→falling→rescued/lost;
-   Revenger humanoid animation binding, captor carry+mutate, mutant; build with
-   placeholder art — implement, don't redesign)
+4. Scoring & HUD — **DONE** (built via VS Code Copilot/Sonnet 4.6 from
+   `docs/PHASE4_SPEC.md`: `game_hud.tscn`, group-tracked `radar.gd`, pause menu +
+   control-scheme settings panel, `hud_manager.gd` rewrite; verified headless)
+5. Pickup/rescue state machine — **DONE** (built from `docs/PHASE5_SPEC.md`;
+   see "Rescue mechanic" below; verified headless)
 6. Movement interface impls + integration test + architecture review
    (`MovementController` base was stubbed early, in Phase 1, by design)
 

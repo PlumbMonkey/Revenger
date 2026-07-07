@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" format=3]
+
+[ext_resource type="Material" path="res://games/revenger/enemies/materials/toon_enemy_mutant.tres" id="1_bgy64"]
+[ext_resource type="Script" path="res://framework/movement/patterns/linear_pattern.gd" id="2_7p4ur"]
+[ext_resource type="PackedScene" path="res://games/revenger/enemies/enemy_mutant.tscn" id="3_ng4nt"]
+[ext_resource type="Script" path="res://framework/data/enemy_definition.gd" id="4_ia6xi"]
+[ext_resource type="PackedScene" path="res://games/revenger/weapons/enemy_pulse_shot.tscn" id="5_fi4xk"]
+
+[resource]
+script = ExtResource("4_ia6xi")
+id = &"mutant"
+display_name = "Mutant"
+scene = ExtResource("3_ng4nt")
+max_health = 2.0
+points = 200
+movement_pattern = ExtResource("2_7p4ur")
+movement_params = {
+"direction": Vector3(0, 0, -1),
+"speed": 13.0
+}
+death_burst = &"pulse_impact"
+hit_flash = &"pulse_impact"
+weapon_scene = ExtResource("5_fi4xk")
+fire_interval = 1.0
+muzzle_offset = Vector3(0, 0, -3)
+material_override = ExtResource("1_bgy64")

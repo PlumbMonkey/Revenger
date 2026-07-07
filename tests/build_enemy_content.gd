@@ -23,6 +23,8 @@ func _init() -> void:
 	_make_material("toon_enemy_grunt", Color(0.52, 0.20, 0.78), 3)
 	_make_material("toon_enemy_swarmer", Color(0.97, 0.52, 0.10), 2)
 	_make_material("toon_enemy_gunner", Color(0.13, 0.72, 0.52), 3)
+	_make_material("toon_enemy_captor", Color(0.75, 0.85, 0.20), 3)
+	_make_material("toon_enemy_mutant", Color(0.85, 0.05, 0.55), 2)
 
 	# --- enemy definitions ---
 	# id, scene, hp, pts, speed, weapon, interval, muzzle_z, death_burst, material
@@ -35,6 +37,15 @@ func _init() -> void:
 		{"spread_speed": 7.0, "break_boost": 1.9, "tight_drift": 1.2})
 	_make_def("gunner", "enemy_gunner", 3.0, 150, 5.0, PULSE, 1.6, -3.5, &"pulse_impact", "toon_enemy_gunner")
 	_make_def("heavy", "enemy_heavy", 10.0, 600, 3.0, LASER, 1.4, -2.6, &"laser_impact", "toon_enemy_heavy")
+
+	# --- Phase 5: rescue mechanic ---
+	# mutant: fast, aggressive, born from a captor that carried a human off
+	# the top (see captor.gd _mutate()). No weapon/movement code of its own —
+	# just data, like grunt/gunner/heavy.
+	_make_def("mutant", "enemy_mutant", 2.0, 200, 13.0, PULSE, 1.0, -3.0, &"pulse_impact", "toon_enemy_mutant")
+	# captor (the Lander): weak and slow as a fallback straggler (fire_interval
+	# 0 -> no weapon; captor.gd's own carry logic is the real threat, not guns).
+	_make_def("captor", "enemy_captor", 2.0, 50, 4.0, PULSE, 0.0, -2.0, &"pulse_impact", "toon_enemy_captor")
 
 	# --- levels (WaveSets). swarmer always spawns in sets of 3 per design. ---
 	_make_level("level_1", [
@@ -52,8 +63,13 @@ func _init() -> void:
 		[["heavy", 2, 1.5], ["swarmer", 3, 0.25]],
 		[["heavy", 1, 0.0], ["gunner", 4, 0.6], ["swarmer", 3, 0.25]],
 	])
+	# Small demo level exercising captors through the real WaveSpawner
+	# pipeline (tests/rescue_playtest.tscn uses this).
+	_make_level("level_rescue_demo", [
+		[["captor", 3, 1.5]],
+	])
 
-	print("BUILD OK — materials, 4 enemy defs, 3 levels written.")
+	print("BUILD OK — materials, 6 enemy defs, 4 levels written.")
 	quit()
 
 

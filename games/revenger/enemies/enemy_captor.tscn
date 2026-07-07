@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3]
+
+; Placeholder mesh (reuses the gunner model) until a dedicated captor/Lander
+; model exists — per the spec, this needs no new rig, so any enemy ship works.
+
+[ext_resource type="Script" path="res://games/revenger/enemies/captor.gd" id="1_captor"]
+[ext_resource type="PackedScene" uid="uid://bbkl7xr7oxedu" path="res://games/revenger/assets/Revenger. enemy 4.glb" id="2_model"]
+[ext_resource type="Resource" path="res://games/revenger/enemies/mutant.tres" id="3_mutant"]
+
+[sub_resource type="BoxShape3D" id="BoxShape_captor"]
+size = Vector3(7.24, 2.26, 6.14)
+
+[node name="Captor" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_captor")
+mutant_definition = ExtResource("3_mutant")
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_captor")

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WaveSet" format=3]
+
+[ext_resource type="Script" path="res://framework/data/wave_set.gd" id="1_pxkcy"]
+[ext_resource type="Script" path="res://framework/data/wave_definition.gd" id="2_ul06y"]
+[ext_resource type="Script" path="res://framework/data/spawn_entry.gd" id="3_qo3j4"]
+[ext_resource type="Resource" path="res://games/revenger/enemies/captor.tres" id="4_rly61"]
+
+[sub_resource type="Resource" id="Resource_sukr8"]
+script = ExtResource("3_qo3j4")
+enemy = ExtResource("4_rly61")
+count = 3
+interval = 1.5
+
+[sub_resource type="Resource" id="Resource_0yow6"]
+script = ExtResource("2_ul06y")
+id = &"level_rescue_demo_wave"
+entries = Array[ExtResource("3_qo3j4")]([SubResource("Resource_sukr8")])
+
+[resource]
+script = ExtResource("1_pxkcy")
+id = &"level_rescue_demo"
+waves = Array[ExtResource("2_ul06y")]([SubResource("Resource_0yow6")])
+time_between_waves = 3.0

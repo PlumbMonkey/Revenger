@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://games/revenger/rescue/humanoid.gd" id="1_humanoid"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+radius = 0.4
+height = 1.6
+
+[node name="Humanoid" type="Node3D"]
+script = ExtResource("1_humanoid")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_1")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3]
+
+; Placeholder mesh (reuses the swarmer model) until the real mutant model
+; (built from a humanoid base, per the owner's plan) is ready — swap the
+; Model instance's PackedScene then, no other changes needed.
+
+[ext_resource type="Script" path="res://framework/enemies/enemy_base.gd" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://cong5r0lg35v8" path="res://games/revenger/assets/Revenger. enemy 3.glb" id="2_model"]
+
+[sub_resource type="BoxShape3D" id="BoxShape_mutant"]
+size = Vector3(5.29, 2.23, 5.59)
+
+[node name="EnemyMutant" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_base")
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_mutant")
