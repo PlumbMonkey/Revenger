@@ -28,7 +28,8 @@ func _check_autoloads_registered() -> void:
 
 func _check_input_contract() -> void:
 	for action in ["move_left", "move_right", "move_up", "move_down", "fire",
-			"action_secondary", "aim_left", "aim_right", "aim_up", "aim_down", "pause"]:
+			"action_secondary", "aim_left", "aim_right", "aim_up", "aim_down", "pause",
+			"brake", "warp"]:
 		if not InputMap.has_action(action):
 			_failures.append("InputMap action missing: " + action)
 

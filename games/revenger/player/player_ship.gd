@@ -17,10 +17,19 @@ const LASER: PackedScene = preload("res://games/revenger/weapons/laser_bolt.tscn
 @export var hit_burst: StringName = &"pulse_impact"
 @export var movement_params: Dictionary = {"accel": 40.0, "max_speed": 25.0, "damping": 3.0}
 
+## Warp (Defender hyperspace): reappear at a random spot inside these world-XZ
+## bounds. The game should set this to its play area (matches radar bounds).
+@export var warp_bounds: Rect2 = Rect2(-60, -60, 120, 120)
+@export var warp_cooldown: float = 1.5
+@export var warp_invuln: float = 1.0
+@export var warp_burst: StringName = &"pulse_impact"
+
 var health: float
 var _controller: MovementController
 var _cooldown: float = 0.0
 var _invuln: float = 0.0
+var _warp_cd: float = 0.0
+var _warp_was_held: bool = false
 var _heading: Vector3 = Vector3(0, 0, -1)
 var _dead: bool = false
 
@@ -52,6 +61,14 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_pressed(&"fire") and _cooldown <= 0.0:
 		_fire()
+	_warp_cd -= delta
+	# Manual edge detection, NOT is_action_just_pressed: just_pressed misses
+	# presses that land between physics ticks (frame-stamp mismatch in
+	# _physics_process) — this catches every press exactly once.
+	var warp_held := Input.is_action_pressed(&"warp")
+	if warp_held and not _warp_was_held and _warp_cd <= 0.0:
+		_warp()
+	_warp_was_held = warp_held
 	_try_catch()
 
 
@@ -74,6 +91,21 @@ func _try_catch() -> void:
 			continue
 		if global_position.distance_to(pickup.global_position) <= catch_radius:
 			pickup.catch()
+
+
+## Defender hyperspace: vanish, reappear somewhere random in the play bounds.
+## Keeps momentum (reads as a blink, not a stop); brief invulnerability covers
+## the disorientation; cooldown prevents warp-spam.
+func _warp() -> void:
+	_warp_cd = warp_cooldown
+	EventBus.vfx_burst_requested.emit(warp_burst, global_position)  # departure flash
+	var target := Vector2(
+		randf_range(warp_bounds.position.x, warp_bounds.position.x + warp_bounds.size.x),
+		randf_range(warp_bounds.position.y, warp_bounds.position.y + warp_bounds.size.y))
+	global_position = Vector3(target.x, global_position.y, target.y)
+	_invuln = maxf(_invuln, warp_invuln)
+	EventBus.screen_shake_requested.emit(0.4, 0.25)
+	EventBus.vfx_burst_requested.emit(warp_burst, global_position)  # arrival flash
 
 
 ## Projectile contract — enemy shots call this on impact.

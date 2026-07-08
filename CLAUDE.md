@@ -32,9 +32,17 @@ side channels.
 ## Input
 
 - Gameplay code reads **InputMap actions only** (`move_*`, `fire`,
-  `action_secondary`, `aim_*`, `pause` — defined in project.godot), never raw
-  device events. Keyboard, mouse, and Xbox gamepad are all bound to every action
-  and stay live at all times.
+  `action_secondary`, `aim_*`, `pause`, `brake`, `warp` — defined in
+  project.godot), never raw device events. Keyboard, mouse, and Xbox gamepad are
+  all bound to every action and stay live at all times. Revenger mappings:
+  boost = `action_secondary` (Shift / RMB / A — boost IS its secondary action),
+  brake = Ctrl / LB, warp = H / Y (Defender hyperspace: random relocation with
+  cooldown + arrival invulnerability).
+- **Gotcha:** don't use `is_action_just_pressed` in `_physics_process` — presses
+  landing between physics ticks get missed (and simulated `Input.action_press`
+  in headless tests always lands between ticks). Use manual edge detection on
+  `is_action_pressed` (see player_ship.gd warp). In headless tests, await
+  `physics_frame` not `process_frame` when waiting for input-driven physics.
 - `SettingsManager.control_scheme` (KEYBOARD_MOUSE / KEYBOARD / GAMEPAD, persisted)
   never disables bindings — it only drives what must be single-device: aim source
   (mouse position vs `aim_*` right stick vs movement direction) and HUD button

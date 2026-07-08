@@ -41,6 +41,8 @@ func _ready() -> void:
 	await _check_damage_death_respawn(ship)
 	await _check_catch(ship)
 	await _check_shake(cam)
+	await _check_boost_brake(ship)
+	await _check_warp(ship)
 
 	_report()
 
@@ -161,9 +163,62 @@ func _check_shake(cam: Camera3D) -> void:
 		_failures.append("shake: camera did not settle back to rest")
 
 
+# --- 7: boost exceeds base top speed; brake pulls it right back down ---
+func _check_boost_brake(ship: PlayerShip) -> void:
+	var base_max: float = ship.movement_params.get("max_speed", 25.0)
+	Input.action_press(&"move_up")
+	Input.action_press(&"action_secondary")  # boost
+	await get_tree().create_timer(1.2).timeout
+	var boosted_speed: float = ship.velocity.length()
+	Input.action_release(&"action_secondary")
+	if boosted_speed <= base_max + 1.0:
+		_failures.append("boost: speed %.1f did not exceed base max %.1f" % [boosted_speed, base_max])
+
+	Input.action_press(&"brake")
+	await get_tree().create_timer(0.8).timeout
+	var braked_speed: float = ship.velocity.length()
+	Input.action_release(&"brake")
+	Input.action_release(&"move_up")
+	if braked_speed >= base_max * 0.5:
+		_failures.append("brake: speed %.1f did not drop below half of base max" % braked_speed)
+	await get_tree().create_timer(0.5).timeout
+
+
+# --- 8: warp relocates inside bounds, grants invuln, respects cooldown ---
+func _check_warp(ship: PlayerShip) -> void:
+	var before: Vector3 = ship.global_position
+	Input.action_press(&"warp")
+	# physics_frame, not process_frame: headless idle frames can outrun physics
+	# ticks, and the ship reads input in _physics_process.
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	Input.action_release(&"warp")
+
+	var after: Vector3 = ship.global_position
+	if after.distance_to(before) < 0.5:
+		_failures.append("warp: ship did not relocate")
+	var b: Rect2 = ship.warp_bounds
+	if after.x < b.position.x - 0.01 or after.x > b.position.x + b.size.x + 0.01 \
+			or after.z < b.position.y - 0.01 or after.z > b.position.y + b.size.y + 0.01:
+		_failures.append("warp: landed outside warp_bounds (%.1f, %.1f)" % [after.x, after.z])
+	var h: float = ship.health
+	ship.take_hit(1.0)  # must be ignored during warp invulnerability
+	if ship.health != h:
+		_failures.append("warp: take_hit not ignored during warp invulnerability")
+
+	# cooldown: an immediate second warp must not move the ship
+	var pos_before_second: Vector3 = ship.global_position
+	Input.action_press(&"warp")
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	Input.action_release(&"warp")
+	if ship.global_position.distance_to(pos_before_second) > 0.5:
+		_failures.append("warp: cooldown did not block an immediate second warp")
+
+
 func _report() -> void:
 	if _failures.is_empty():
-		print("INTEGRATION CHECK PASS — spawn, input-driven flight, fire/kill/score, damage/death/lives, respawn invuln, catch, and shake all verified")
+		print("INTEGRATION CHECK PASS — spawn, flight, fire/kill/score, damage/death/lives, respawn invuln, catch, shake, boost/brake, and warp all verified")
 	else:
 		print("INTEGRATION CHECK FAIL:")
 		for f: String in _failures:
