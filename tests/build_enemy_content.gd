@@ -97,7 +97,8 @@ func _make_def(id: String, scene_name: String, hp: float, pts: int, speed: float
 	def.max_health = hp
 	def.points = pts
 	def.movement_pattern = load(pattern_path)
-	def.movement_params = {"direction": Vector3(0, 0, -1), "speed": speed}
+	# Side-scroller: enemies sweep across the screen along -X.
+	def.movement_params = {"direction": Vector3(-1, 0, 0), "speed": speed}
 	def.movement_params.merge(extra_move)
 	def.weapon_scene = load(weapon_path)
 	def.fire_interval = interval

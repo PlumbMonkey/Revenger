@@ -17,9 +17,9 @@ const LASER: PackedScene = preload("res://games/revenger/weapons/laser_bolt.tscn
 @export var hit_burst: StringName = &"pulse_impact"
 @export var movement_params: Dictionary = {"accel": 40.0, "max_speed": 25.0, "damping": 3.0}
 
-## Warp (Defender hyperspace): reappear at a random spot inside these world-XZ
-## bounds. The game should set this to its play area (matches radar bounds).
-@export var warp_bounds: Rect2 = Rect2(-60, -60, 120, 120)
+## Warp (Defender hyperspace): reappear at a random spot inside these world-XY
+## bounds (x = scroll axis, y = altitude). Set to the game's play area.
+@export var warp_bounds: Rect2 = Rect2(-60, 2, 120, 35)
 @export var warp_cooldown: float = 1.5
 @export var warp_invuln: float = 1.0
 @export var warp_burst: StringName = &"pulse_impact"
@@ -30,7 +30,7 @@ var _cooldown: float = 0.0
 var _invuln: float = 0.0
 var _warp_cd: float = 0.0
 var _warp_was_held: bool = false
-var _heading: Vector3 = Vector3(0, 0, -1)
+var _heading: Vector3 = Vector3(1, 0, 0)  # side-scroller: start facing right
 var _dead: bool = false
 
 
@@ -52,11 +52,11 @@ func _physics_process(delta: float) -> void:
 	velocity = _controller.compute_velocity(velocity, delta)
 	move_and_slide()
 
-	# Yaw to face travel direction; keep the last heading when near-still so
-	# firing while drifting/stopped stays aimed.
-	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
-	if horizontal.length() > 0.5:
-		_heading = horizontal.normalized()
+	# Defender-style facing: strictly left or right along the scroll axis,
+	# flipping when horizontal travel reverses. Vertical movement never pitches
+	# the ship, and firing stays horizontal.
+	if absf(velocity.x) > 0.5:
+		_heading = Vector3(signf(velocity.x), 0.0, 0.0)
 	transform.basis = Basis.looking_at(_heading, Vector3.UP)
 
 	if Input.is_action_pressed(&"fire") and _cooldown <= 0.0:
@@ -102,7 +102,7 @@ func _warp() -> void:
 	var target := Vector2(
 		randf_range(warp_bounds.position.x, warp_bounds.position.x + warp_bounds.size.x),
 		randf_range(warp_bounds.position.y, warp_bounds.position.y + warp_bounds.size.y))
-	global_position = Vector3(target.x, global_position.y, target.y)
+	global_position = Vector3(target.x, target.y, global_position.z)
 	_invuln = maxf(_invuln, warp_invuln)
 	EventBus.screen_shake_requested.emit(0.4, 0.25)
 	EventBus.vfx_burst_requested.emit(warp_burst, global_position)  # arrival flash

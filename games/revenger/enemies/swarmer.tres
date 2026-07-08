@@ -16,7 +16,7 @@ points = 75
 movement_pattern = ExtResource("2_fuo1p")
 movement_params = {
 "break_boost": 1.9,
-"direction": Vector3(0, 0, -1),
+"direction": Vector3(-1, 0, 0),
 "speed": 8.5,
 "spread_speed": 7.0,
 "tight_drift": 1.2

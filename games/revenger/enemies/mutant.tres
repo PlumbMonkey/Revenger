@@ -15,7 +15,7 @@ max_health = 2.0
 points = 200
 movement_pattern = ExtResource("2_7p4ur")
 movement_params = {
-"direction": Vector3(0, 0, -1),
+"direction": Vector3(-1, 0, 0),
 "speed": 13.0
 }
 death_burst = &"pulse_impact"

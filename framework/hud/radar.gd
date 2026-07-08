@@ -8,6 +8,11 @@ extends Control
 ## to radar_player; Phase 5 pickups use radar_pickup.
 ## get_blip_counts() is usable headless (reads groups, no rendering needed).
 
+## Which world plane the radar projects. XZ = top-down games (world X → radar
+## x, world Z → radar y). XY = side-scrollers (world X → radar x, world Y →
+## radar y, flipped so up on screen is up on the radar).
+@export_enum("XZ", "XY") var plane: String = "XZ"
+
 @export var player_color: Color = Color.CYAN
 @export var enemy_color: Color = Color(1.0, 0.2, 0.2)
 @export var pickup_color: Color = Color.GREEN
@@ -58,9 +63,13 @@ func _draw_group(group: StringName, color: Color, blip_size: float) -> void:
 
 
 func _world_to_radar(world_pos: Vector3) -> Vector2:
-	## X → radar x, Z → radar y.
 	var nx: float = (world_pos.x - _world_bounds.position.x) / _world_bounds.size.x
-	var ny: float = (world_pos.z - _world_bounds.position.y) / _world_bounds.size.y
+	var ny: float
+	if plane == "XY":
+		# side view: world +Y is up, radar +y is down — flip
+		ny = 1.0 - (world_pos.y - _world_bounds.position.y) / _world_bounds.size.y
+	else:
+		ny = (world_pos.z - _world_bounds.position.y) / _world_bounds.size.y
 	return Vector2(nx * size.x, ny * size.y)
 
 

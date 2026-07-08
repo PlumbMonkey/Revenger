@@ -14,7 +14,7 @@ scene = ExtResource("3_2ey0k")
 max_health = 2.0
 movement_pattern = ExtResource("2_lppa2")
 movement_params = {
-"direction": Vector3(0, 0, -1),
+"direction": Vector3(-1, 0, 0),
 "speed": 6.0
 }
 death_burst = &"pulse_impact"

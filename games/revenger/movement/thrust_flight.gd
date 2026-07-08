@@ -1,6 +1,7 @@
 class_name ThrustFlightController
 extends MovementController
-## Revenger player movement: momentum-based thrust flight on the XZ plane.
+## Revenger player movement: momentum-based thrust flight on the XY plane
+## (side-scroller: X = scroll axis, Y = altitude — Defender orientation).
 ## Reads InputMap actions (never raw devices, per the input architecture) in
 ## compute_velocity() — the same MovementController contract AI patterns use,
 ## which is the point: one interface serves both AI movers and a human ship.
@@ -22,10 +23,10 @@ func compute_velocity(current_velocity: Vector3, delta: float) -> Vector3:
 		max_speed *= boost
 
 	var input_vec: Vector2 = Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down")
-	var thrust := Vector3(input_vec.x, 0.0, input_vec.y)  # up on stick = -Z = forward
+	var thrust := Vector3(input_vec.x, -input_vec.y, 0.0)  # stick up = climb (+Y)
 
 	var v := current_velocity
-	v.y = 0.0  # thrust flight stays on the gameplay plane
+	v.z = 0.0  # side-scroller: flight stays on the XY plane
 	if thrust.length_squared() > 0.0:
 		v += thrust * accel * delta
 	else:

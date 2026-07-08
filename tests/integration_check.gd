@@ -65,15 +65,15 @@ func _check_spawn(ship: PlayerShip) -> void:
 		_failures.append("spawn: ship not in radar_player group")
 
 
-# --- 2: InputMap-driven movement ---
+# --- 2: InputMap-driven movement (side view: up = climb along +Y) ---
 func _check_movement(ship: PlayerShip) -> void:
-	var start_z: float = ship.global_position.z
+	var start_y: float = ship.global_position.y
 	Input.action_press(&"move_up")
 	await get_tree().create_timer(0.7).timeout
 	Input.action_release(&"move_up")
-	if ship.global_position.z >= start_z - 1.0:
-		_failures.append("movement: ship did not fly forward under move_up (z %.2f -> %.2f)" \
-			% [start_z, ship.global_position.z])
+	if ship.global_position.y <= start_y + 1.0:
+		_failures.append("movement: ship did not climb under move_up (y %.2f -> %.2f)" \
+			% [start_y, ship.global_position.y])
 	# coast to (near) rest so later checks are stable
 	await get_tree().create_timer(1.0).timeout
 
@@ -84,8 +84,8 @@ func _check_fire_kill_score(ship: PlayerShip) -> void:
 	var enemy: EnemyBase = (def.scene as PackedScene).instantiate()
 	enemy.setup(def)
 	add_child(enemy)
-	# directly down the ship's current heading (-Z after forward flight)
-	enemy.global_position = ship.global_position + Vector3(0, 0, -18)
+	# down the ship's heading: +X (ship starts facing right, climb didn't turn it)
+	enemy.global_position = ship.global_position + Vector3(18, 0, 0)
 
 	var died := [false]
 	EventBus.enemy_died.connect(func(_e: Node, _p: int, _pos: Vector3) -> void: died[0] = true,
@@ -93,6 +93,7 @@ func _check_fire_kill_score(ship: PlayerShip) -> void:
 	var score_before: int = ScoreManager.score
 
 	Input.action_press(&"fire")
+	# ship starts facing +X (side-scroller); bolts fly +X toward the enemy
 	var killed: bool = await _await_until(func() -> bool: return died[0], 5.0)
 	Input.action_release(&"fire")
 
@@ -198,9 +199,10 @@ func _check_warp(ship: PlayerShip) -> void:
 	if after.distance_to(before) < 0.5:
 		_failures.append("warp: ship did not relocate")
 	var b: Rect2 = ship.warp_bounds
+	# side view: bounds are world X (scroll) x world Y (altitude)
 	if after.x < b.position.x - 0.01 or after.x > b.position.x + b.size.x + 0.01 \
-			or after.z < b.position.y - 0.01 or after.z > b.position.y + b.size.y + 0.01:
-		_failures.append("warp: landed outside warp_bounds (%.1f, %.1f)" % [after.x, after.z])
+			or after.y < b.position.y - 0.01 or after.y > b.position.y + b.size.y + 0.01:
+		_failures.append("warp: landed outside warp_bounds (%.1f, %.1f)" % [after.x, after.y])
 	var h: float = ship.health
 	ship.take_hit(1.0)  # must be ignored during warp invulnerability
 	if ship.health != h:

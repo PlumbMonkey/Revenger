@@ -73,6 +73,12 @@ func _physics_process(delta: float) -> void:
 		return
 	velocity = _pattern.compute_velocity(velocity, delta)
 	move_and_slide()
+	# Face travel direction (Y flattened — climbing/diving shouldn't pitch the
+	# hull, and it keeps weapons firing level). Near-vertical or near-still
+	# movers keep their last facing. Generic: works side-view and top-down.
+	var flat := Vector3(velocity.x, 0.0, velocity.z)
+	if flat.length() > 0.5:
+		transform.basis = Basis.looking_at(flat.normalized(), Vector3.UP)
 
 
 func _apply_material(node: Node, mat: Material) -> void:

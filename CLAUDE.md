@@ -20,6 +20,13 @@ shooter. PRD: `Shared_Arcade_Framework_PRD.pdf` on the owner's Desktop.
   actors apply it. Never branch on "which game is this".
 - 3D rendering (Blender asset pipeline), gameplay locked to a plane. Positions in
   signals/APIs are `Vector3`.
+- **Revenger is a SIDE-SCROLLER (Defender orientation)**: gameplay on the **XY**
+  plane — X = scroll axis, Y = altitude, camera side-on from +Z. Enemies sweep
+  along −X (data: `movement_params.direction`), the ship faces strictly ±X and
+  fires horizontally, captors climb +Y / humanoids fall −Y (the rescue mechanic
+  was always Y-up). The radar has a `plane` export ("XZ" top-down / "XY" side)
+  set via `HUDManager.set_radar_bounds(bounds, "XY")` — the Robotron-alike will
+  use "XZ", the Joust-alike "XY".
 
 ## Architecture
 

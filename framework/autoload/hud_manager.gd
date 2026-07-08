@@ -15,6 +15,7 @@ var _canvas: CanvasLayer = null
 var _custom_hud: Control = null
 var _pending_bounds: Rect2 = Rect2()
 var _has_pending_bounds: bool = false
+var _pending_plane: String = "XZ"
 
 
 func _ready() -> void:
@@ -49,8 +50,10 @@ func hide_hud() -> void:
 		_canvas.visible = false
 
 
-## Passes world-XZ bounding rect to the radar. Stored if HUD not shown yet.
-func set_radar_bounds(bounds: Rect2) -> void:
+## Passes the world bounding rect to the radar (plane decides which axes:
+## "XZ" for top-down games, "XY" for side-scrollers). Stored if HUD not up yet.
+func set_radar_bounds(bounds: Rect2, plane: String = "XZ") -> void:
+	_pending_plane = plane
 	if _canvas != null:
 		_apply_radar_bounds(bounds)
 	else:
@@ -71,6 +74,7 @@ func _apply_radar_bounds(bounds: Rect2) -> void:
 		return
 	var radar := game_hud.get_node_or_null("%Radar")
 	if radar != null and radar.has_method("set_world_bounds"):
+		radar.set("plane", _pending_plane)
 		radar.call("set_world_bounds", bounds)
 
 

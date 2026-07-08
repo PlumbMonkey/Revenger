@@ -15,7 +15,7 @@ max_health = 3.0
 points = 150
 movement_pattern = ExtResource("2_deei8")
 movement_params = {
-"direction": Vector3(0, 0, -1),
+"direction": Vector3(-1, 0, 0),
 "speed": 5.0
 }
 death_burst = &"pulse_impact"
