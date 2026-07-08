@@ -193,13 +193,18 @@ flows. Keep this scene passing; extend it as phases land.
    control-scheme settings panel, `hud_manager.gd` rewrite; verified headless)
 5. Pickup/rescue state machine — **DONE** (built from `docs/PHASE5_SPEC.md`;
    see "Rescue mechanic" below; verified headless)
-6. Movement interface + player ship + integration — **SPEC READY: build from
-   `docs/PHASE6_SPEC.md`** (final framework phase). Game-specific PlayerShip +
-   ThrustFlightController (reuses the `MovementController` contract stubbed in
-   Phase 1), fires the existing laser, catches falling humanoids via
-   `RescueObject.catch()`, takes hits; `VFXManager` camera shake finishes
-   Phase 3; integration scene + headless check + architecture review. Build with
-   placeholder ship art — implement, don't redesign.
+6. Movement interface + player ship + integration — **DONE. FRAMEWORK COMPLETE.**
+   `PlayerShip` (`games/revenger/player/`, placeholder box art — real hero ship
+   swaps in) + `ThrustFlightController` prove the `MovementController` contract
+   serves human input and AI alike. Ship fires the laser, catches falling
+   humanoids, takes hits via the projectile contract, respawns with invuln;
+   `VFXManager.register_camera()` + real `shake()` finish Phase 3.
+   `tests/integration.tscn` = the playable full-loop scene (F6: WASD/stick +
+   Space/RT). `tests/integration_check.tscn` = headless acceptance (simulated
+   input end-to-end). `docs/PHASE6_REVIEW.md` = the final architecture review:
+   **build-once-reuse-thrice HOLDS, zero framework leaks** (+ documented debts:
+   global high-score file, ship ignores enemy-body ramming, mutants outside
+   wave counting).
 
 ## Process
 

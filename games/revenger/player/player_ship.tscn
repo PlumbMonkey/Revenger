@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+; PLACEHOLDER ART: box hull. The real hero ship (Blender "Cube" object, with
+; Gun_Barrel _Muzzle empties positioned for firing) swaps in as a mesh change.
+
+[ext_resource type="Script" path="res://games/revenger/player/player_ship.gd" id="1_script"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ship"]
+size = Vector3(6, 2, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape_ship"]
+size = Vector3(6, 2, 8)
+
+[node name="PlayerShip" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 17
+script = ExtResource("1_script")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_ship")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_ship")

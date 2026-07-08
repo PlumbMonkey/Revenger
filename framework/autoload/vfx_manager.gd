@@ -13,6 +13,12 @@ extends Node
 var _pools: Dictionary = {}
 var _warned_types: Dictionary = {}
 
+var _camera: Camera3D = null
+var _cam_rest: Transform3D
+var _shake_time_left: float = 0.0
+var _shake_duration: float = 0.0
+var _shake_intensity: float = 0.0
+
 
 func _ready() -> void:
 	EventBus.vfx_burst_requested.connect(burst)
@@ -51,6 +57,51 @@ func burst(burst_type: StringName, position: Vector3) -> void:
 		node.call("fire")
 
 
-## Phase 3 remainder: camera shake lands with the HUD/camera work.
+## The game registers its camera once; shake() then works from anywhere.
+## The rest transform is captured here — treat the camera as static while a
+## shake plays (games with a moving camera rig should register a camera that
+## is a child of the rig, so the rig moves and the child shakes).
+func register_camera(cam: Camera3D) -> void:
+	_end_shake()
+	_camera = cam
+	_cam_rest = cam.transform
+
+
+## Decaying random positional offset. Overlapping requests take the max of
+## intensity and remaining time — repeated hits never stack into nausea.
 func shake(intensity: float, duration: float) -> void:
-	print_verbose("VFXManager: shake %.2f for %.2fs (camera hook pending)" % [intensity, duration])
+	if _camera == null or not is_instance_valid(_camera):
+		return
+	if _shake_time_left <= 0.0:
+		_cam_rest = _camera.transform  # re-capture in case the game moved it
+	_shake_intensity = maxf(_shake_intensity, intensity)
+	_shake_time_left = maxf(_shake_time_left, duration)
+	_shake_duration = maxf(_shake_duration, duration)
+
+
+func _process(delta: float) -> void:
+	if _shake_time_left <= 0.0:
+		return
+	if _camera == null or not is_instance_valid(_camera):
+		_shake_time_left = 0.0
+		return
+	_shake_time_left -= delta
+	if _shake_time_left <= 0.0:
+		_end_shake()
+		return
+	var falloff: float = _shake_time_left / maxf(_shake_duration, 0.001)
+	var magnitude: float = _shake_intensity * falloff
+	var offset := Vector3(
+		randf_range(-1.0, 1.0),
+		randf_range(-1.0, 1.0),
+		randf_range(-1.0, 1.0)) * magnitude
+	_camera.transform = _cam_rest
+	_camera.transform.origin += offset
+
+
+func _end_shake() -> void:
+	if _camera != null and is_instance_valid(_camera) and _shake_duration > 0.0:
+		_camera.transform = _cam_rest
+	_shake_time_left = 0.0
+	_shake_duration = 0.0
+	_shake_intensity = 0.0
