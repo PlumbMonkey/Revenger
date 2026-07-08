@@ -1,6 +1,13 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://tests/integration.gd" id="1_script"]
+
+[sub_resource type="Environment" id="Environment_space"]
+background_mode = 1
+background_color = Color(0, 0, 0, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.12, 0.12, 0.18, 1)
+ambient_light_energy = 0.6
 
 [sub_resource type="BoxMesh" id="BoxMesh_ground"]
 size = Vector3(200, 2, 20)
@@ -13,6 +20,9 @@ albedo_color = Color(0.15, 0.12, 0.2, 1)
 
 [node name="Integration" type="Node3D"]
 script = ExtResource("1_script")
+
+[node name="Space" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_space")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 95)

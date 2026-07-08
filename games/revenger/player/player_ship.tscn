@@ -1,23 +1,24 @@
 [gd_scene load_steps=4 format=3]
 
-; PLACEHOLDER ART: box hull. The real hero ship (Blender "Cube" object, with
-; Gun_Barrel _Muzzle empties positioned for firing) swaps in as a mesh change.
+; THE hero ship: hull + guns (with _Muzzle empties) + canopy + cockpit +
+; Crackle, exported from Blender with mirrors baked. Model transform:
+; 180-deg Y flip (glTF nose came in at +Z; Godot forward is -Z), 0.25 scale
+; (40.6m hull -> ~10m vs 3-7m enemies), recentered so the pivot is mid-hull.
 
 [ext_resource type="Script" path="res://games/revenger/player/player_ship.gd" id="1_script"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_ship"]
-size = Vector3(6, 2, 8)
+[ext_resource type="PackedScene" uid="uid://dg2pjo81wko5h" path="res://games/revenger/assets/Revenger. hero ship.glb" id="2_model"]
 
 [sub_resource type="BoxShape3D" id="BoxShape_ship"]
-size = Vector3(6, 2, 8)
+size = Vector3(8.9, 3.5, 10.2)
 
 [node name="PlayerShip" type="CharacterBody3D"]
 collision_layer = 2
 collision_mask = 17
 script = ExtResource("1_script")
+muzzle_offset = Vector3(0, 0, -6)
 
-[node name="Mesh" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_ship")
+[node name="Model" parent="." instance=ExtResource("2_model")]
+transform = Transform3D(-0.25, 0, 0, 0, 0.25, 0, 0, 0, -0.25, 0, -0.6, 4.82)
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape_ship")

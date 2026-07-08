@@ -55,8 +55,39 @@ func _ready() -> void:
 		WaveSpawner.start_waves()
 	)
 
+	_spawn_starfield()
+
 	if DisplayServer.get_name() == "headless":
 		await get_tree().create_timer(4.0).timeout
 		WaveSpawner.stop_waves()
 		print("INTEGRATION SMOKE OK — side-view full loop ran 4s headless without error")
 		get_tree().quit(0)
+
+
+## Sporadic emissive pixels on a plane behind the action — stars against the
+## black WorldEnvironment. MultiMesh: one draw call for the whole field.
+func _spawn_starfield(count: int = 110) -> void:
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color(1, 1, 1)
+	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.3, 0.3)
+	quad.material = mat
+
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = quad
+	mm.instance_count = count
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 20260707  # fixed seed: the sky doesn't reshuffle every run
+	for i in count:
+		var s: float = rng.randf_range(0.5, 1.6)  # size variety = depth feel
+		var t := Transform3D(Basis().scaled(Vector3(s, s, s)),
+			Vector3(rng.randf_range(-120, 120), rng.randf_range(-2, 70), rng.randf_range(-35, -20)))
+		mm.set_instance_transform(i, t)
+
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	add_child(mmi)
